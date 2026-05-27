@@ -1,0 +1,67 @@
+# Root ignore for Laravel + React/Vite monorepo
+
+# Environment files
+.env
+.env.*
+
+# PHP / Laravel
+/vendor/
+/backend/vendor/
+/backend/.env
+/backend/.env.*
+/backend/vendor/
+/backend/node_modules/
+/backend/public/hot
+/backend/storage/*.key
+/backend/storage/debugbar/
+/backend/storage/framework/cache/data
+/backend/storage/framework/sessions
+/backend/storage/framework/testing
+/backend/storage/framework/views
+/backend/storage/logs
+/backend/.phpunit.result.cache
+
+# Node / frontend
+/node_modules/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+/frontend/.vite/
+/frontend/.cache/
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/pnpm-debug.log*
+
+# Build outputs
+/public/build/
+/build/
+/dist/
+/coverage/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+
+# Composer / package manager
+composer.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Laravel storage
+/storage/*.key
+/storage/debugbar/
+/storage/framework/cache/data
+/storage/framework/sessions
+/storage/framework/testing
+/storage/framework/views
+/storage/logs
+
+# Misc
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*

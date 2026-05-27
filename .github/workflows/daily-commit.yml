@@ -1,0 +1,33 @@
+name: Daily commit workflow
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create daily workspace check-in
+        run: |
+          echo "Daily check-in: $(date -u +"%Y-%m-%d %H:%M:%SZ")" >> .github/daily-checkin.log
+
+      - name: Commit and push daily check-in
+        run: |
+          git add .github/daily-checkin.log
+          if git diff --cached --quiet; then
+            echo "No daily changes to commit."
+          else
+            git commit -m "chore: daily workflow check-in"
+            git push origin development
+          fi
