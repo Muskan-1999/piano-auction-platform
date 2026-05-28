@@ -1,0 +1,38 @@
+workspace:
+  name: luxury-piano-auction
+  root: .
+  modules:
+    - name: backend
+      path: backend
+      type: laravel
+      description: Laravel 12 API and server-side application
+    - name: frontend
+      path: frontend
+      type: react-vite
+      description: React UI built with Vite and Tailwind CSS
+
+git:
+  workingBranch: development
+  protectedBranch: main
+  commitPrefixes:
+    - feat:
+    - fix:
+    - refactor:
+    - chore:
+
+github:
+  workflows:
+    - .github/workflows/daily-commit.yml
+    - .github/workflows/branch-management.yml
+  safeWorkflow:
+    branchPolicy: "Use development for active work; promote releases through PRs to main."
+    pushPolicy: "No direct main pushes. Use pull requests from development."
+
+workspaceAccess:
+  exclude:
+    - backend/vendor
+    - frontend/node_modules
+    - frontend/dist
+    - frontend/build
+    - .github/daily-checkin.log
+    - .cache
