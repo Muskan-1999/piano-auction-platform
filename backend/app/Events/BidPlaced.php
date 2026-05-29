@@ -2,35 +2,47 @@
 
 namespace App\Events;
 
+use App\Models\Bid;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class BidPlaced
+class BidPlaced implements ShouldBroadcastAfterCommit
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-    public function __construct()
+    public Bid $bid;
+
+    public function __construct(Bid $bid)
     {
-        //
+        $this->bid = $bid;
     }
 
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
-    public function broadcastOn(): array
+    public function broadcastOn(): Channel
+    {
+        return new Channel('lots.' . $this->bid->lot_id);
+    }
+
+    public function broadcastWith(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            'bid' => [
+                'id' => $this->bid->id,
+                'lot_id' => $this->bid->lot_id,
+                'user_id' => $this->bid->user_id,
+                'amount' => $this->bid->amount,
+                'bid_type' => $this->bid->bid_type,
+                'status' => $this->bid->status,
+                'placed_at' => $this->bid->placed_at?->toDateTimeString(),
+                'is_winning' => $this->bid->is_winning,
+            ],
         ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'bid.placed';
     }
 }

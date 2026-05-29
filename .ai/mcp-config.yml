@@ -5,7 +5,7 @@ workspace:
     - name: backend
       path: backend
       type: laravel
-      description: Laravel 12 API and server-side application
+      description: Laravel 11 API and server-side application
     - name: frontend
       path: frontend
       type: react-vite

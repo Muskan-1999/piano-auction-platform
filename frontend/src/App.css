@@ -1,0 +1,79 @@
+/* App root styles - minimal to avoid conflicts with Tailwind */
+
+#root {
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+}
+
+.social-link {
+border-radius: 6px;
+background: var(--social-bg);
+display: flex;
+padding: 6px 12px;
+align-items: center;
+gap: 8px;
+text-decoration: none;
+transition: box-shadow 0.3s;
+}
+
+.social-link:hover {
+box-shadow: var(--shadow);
+}
+
+.social-link .button-icon {
+height: 18px;
+width: 18px;
+}
+
+@media (max-width: 1024px) {
+.social-links {
+margin-top: 20px;
+flex-wrap: wrap;
+justify-content: center;
+}
+
+.social-links li {
+flex: 1 1 calc(50% - 8px);
+}
+
+.social-links a {
+width: 100%;
+justify-content: center;
+box-sizing: border-box;
+}
+}
+
+#spacer {
+height: 88px;
+border-top: 1px solid var(--border);
+}
+
+@media (max-width: 1024px) {
+#spacer {
+height: 48px;
+}
+}
+
+.ticks {
+position: relative;
+width: 100%;
+}
+
+.ticks::before,
+.ticks::after {
+content: '';
+position: absolute;
+top: -4.5px;
+border: 5px solid transparent;
+}
+
+.ticks::before {
+left: 0;
+border-left-color: var(--border);
+}
+
+.ticks::after {
+right: 0;
+border-right-color: var(--border);
+}

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Events\AuctionEnded;
+use App\Events\AuctionStarted;
 use App\Models\Auction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +25,10 @@ class AuctionService
                 $this->ensureOnlyOneLive($auction);
             }
 
+            if ($auction->status === Auction::STATUS_LIVE) {
+                DB::afterCommit(fn () => AuctionStarted::dispatch($auction));
+            }
+
             return $auction;
         });
     }
@@ -30,6 +36,8 @@ class AuctionService
     public function update(Auction $auction, array $data): Auction
     {
         return DB::transaction(function () use ($auction, $data) {
+            $originalStatus = $auction->status;
+
             if (isset($data['title']) && $data['title'] !== $auction->title) {
                 $data['slug'] = $this->generateSlug($data['title'], $auction->id);
             }
@@ -53,6 +61,16 @@ class AuctionService
                 $auction->update(['is_live' => false]);
             }
 
+            if ($originalStatus !== $auction->status) {
+                if ($auction->status === Auction::STATUS_LIVE) {
+                    DB::afterCommit(fn () => AuctionStarted::dispatch($auction));
+                }
+
+                if ($auction->status === Auction::STATUS_ENDED) {
+                    DB::afterCommit(fn () => AuctionEnded::dispatch($auction));
+                }
+            }
+
             return $auction;
         });
     }
@@ -60,6 +78,7 @@ class AuctionService
     public function changeStatus(Auction $auction, string $status): Auction
     {
         return DB::transaction(function () use ($auction, $status) {
+            $originalStatus = $auction->status;
             $auction->status = $status;
             $auction->is_live = $status === Auction::STATUS_LIVE;
             $auction->save();
@@ -70,6 +89,16 @@ class AuctionService
 
             if ($status === Auction::STATUS_ENDED) {
                 $auction->update(['is_live' => false]);
+            }
+
+            if ($originalStatus !== $auction->status) {
+                if ($auction->status === Auction::STATUS_LIVE) {
+                    DB::afterCommit(fn () => AuctionStarted::dispatch($auction));
+                }
+
+                if ($auction->status === Auction::STATUS_ENDED) {
+                    DB::afterCommit(fn () => AuctionEnded::dispatch($auction));
+                }
             }
 
             return $auction;

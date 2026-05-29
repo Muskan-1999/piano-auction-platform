@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-500: #7a3de6;
+    --muted: #6b6375;
+    --surface: #ffffff;
+  }
+  body {
+    @apply bg-surface antialiased text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2 rounded-md font-medium text-white bg-luxury-500 hover:bg-luxury-600 shadow-sm;
+  }
+  .card {
+    @apply bg-white rounded-lg shadow-luxury p-6 border border-border;
+  }
+}

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Events\LotEnded;
+use App\Events\LotStarted;
 use App\Models\Lot;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,6 +38,7 @@ class LotService
     public function changeStatus(Lot $lot, string $status): Lot
     {
         return DB::transaction(function () use ($lot, $status) {
+            $originalStatus = $lot->status;
             $lot->status = $status;
 
             if ($status === Lot::STATUS_LIVE) {
@@ -47,6 +50,16 @@ class LotService
             }
 
             $lot->save();
+
+            if ($originalStatus !== $lot->status) {
+                if ($lot->status === Lot::STATUS_LIVE) {
+                    DB::afterCommit(fn () => LotStarted::dispatch($lot));
+                }
+
+                if (in_array($lot->status, [Lot::STATUS_SOLD, Lot::STATUS_UNSOLD, Lot::STATUS_WITHDRAWN], true)) {
+                    DB::afterCommit(fn () => LotEnded::dispatch($lot));
+                }
+            }
 
             return $lot;
         });
