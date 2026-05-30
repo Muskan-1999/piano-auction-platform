@@ -46,8 +46,8 @@ export default function LiveAuctionsSection() {
   }, [])
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-red-50 to-white w-full">
-      <div className="w-full px-4 md:px-8 lg:px-12">
+    <section className="w-full max-w-none px-0 mx-0 py-16 md:py-24 bg-gradient-to-b from-red-50 to-white">
+      <div className="w-full px-0 mx-0">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className={`w-3 h-3 rounded-full bg-red-600 ${pulse ? 'animate-pulse' : ''}`}></div>
@@ -57,7 +57,7 @@ export default function LiveAuctionsSection() {
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Live Auctions
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600">
             Join thousands of bidders worldwide in real-time piano auctions with live video and expert commentary
           </p>
         </div>

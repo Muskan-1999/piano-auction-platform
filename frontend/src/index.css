@@ -1,19 +1,28 @@
 @import './styles/tailwind.css';
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html,
 body,
 #root {
-  height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 body {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 #root {
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -75,11 +84,10 @@ body {
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  margin: 0;
+  text-align: left;
   min-height: 100svh;
   display: flex;
   flex-direction: column;

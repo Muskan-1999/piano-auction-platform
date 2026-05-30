@@ -10,6 +10,8 @@ import Login from '../pages/Login'
 import Register from '../pages/Register'
 import TelephoneBid from '../pages/TelephoneBid'
 import AbsenteeBid from '../pages/AbsenteeBid'
+import ContactPage from '../pages/ContactPage'
+import BiddingPage from '../pages/BiddingPage'
 import Profile from '../pages/Profile'
 import NotFound from '../pages/NotFound'
 import ProtectedRoute from '../components/ProtectedRoute'
@@ -26,6 +28,9 @@ export default function AppRoutes() {
       <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
       <Route path="/telephone-bid" element={<MainLayout><TelephoneBid /></MainLayout>} />
       <Route path="/absentee-bid" element={<MainLayout><AbsenteeBid /></MainLayout>} />
+      <Route path="/bidding" element={<MainLayout><BiddingPage /></MainLayout>} />
+      <Route path="/contact" element={<MainLayout><ContactPage /></MainLayout>} />
+      <Route path="/contact-us" element={<MainLayout><ContactPage /></MainLayout>} />
       <Route path="/profile" element={<MainLayout><ProtectedRoute><Profile /></ProtectedRoute></MainLayout>} />
       <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
     </Routes>

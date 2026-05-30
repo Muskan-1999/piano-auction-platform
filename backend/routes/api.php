@@ -9,7 +9,9 @@ use App\Http\Controllers\API\Public\AuctionController as PublicAuctionController
 use App\Http\Controllers\API\Public\HomepageController as PublicHomepageController;
 use App\Http\Controllers\API\Public\LotController as PublicLotController;
 use App\Http\Controllers\API\Public\SearchController as PublicSearchController;
+use App\Http\Controllers\API\ContactUsController;
 use App\Http\Controllers\API\TelephoneBidController;
+use App\Http\Controllers\API\BiddingController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('api.')->group(function () {
@@ -38,8 +40,14 @@ Route::name('api.')->group(function () {
     Route::get('public/lots/{slug}', [PublicLotController::class, 'show']);
     Route::get('public/search', [PublicSearchController::class, 'index']);
 
+    Route::post('contact', [ContactUsController::class, 'store']);
     Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
     Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);
+
+    // New bidding endpoints
+    Route::post('bidding/telephone', [BiddingController::class, 'telephone']);
+    Route::post('bidding/absentee', [BiddingController::class, 'absentee']);
+    Route::post('bidding/online', [BiddingController::class, 'online']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('lots/{lot}/bid', [\App\Http\Controllers\API\BidController::class, 'store']);

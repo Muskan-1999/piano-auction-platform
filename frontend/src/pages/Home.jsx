@@ -8,7 +8,7 @@ import NewsletterSection from '../components/NewsletterSection'
 
 export default function Home() {
   return (
-    <div className="bg-white">
+    <div className="w-full max-w-none px-0 mx-0 bg-white">
       <HeroSection />
       <FeaturedAuctionsSection />
       <LiveAuctionsSection />

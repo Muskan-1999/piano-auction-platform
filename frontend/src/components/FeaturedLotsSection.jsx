@@ -78,14 +78,14 @@ const FEATURED_LOTS = [
 
 export default function FeaturedLotsSection() {
   return (
-    <section className="py-16 md:py-24 bg-white w-full">
-      <div className="w-full px-4 md:px-8 lg:px-12">
+    <section className="w-full max-w-none px-0 mx-0 py-16 md:py-24 bg-white">
+      <div className="w-full px-0 mx-0">
         <div className="text-center mb-12">
           <p className="text-luxury-500 font-semibold tracking-widest uppercase text-sm mb-2">Available Now</p>
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Featured Piano Lots
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600">
             Bid on our most sought-after pianos from the world's finest makers
           </p>
         </div>

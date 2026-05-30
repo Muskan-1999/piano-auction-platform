@@ -5,7 +5,7 @@ import './App.css'
 
 export default function App() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="w-full min-h-screen bg-black text-white">
       <AuthProvider>
         <AppRoutes />
       </AuthProvider>

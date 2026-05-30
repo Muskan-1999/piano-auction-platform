@@ -25,9 +25,9 @@ export default function NewsletterSection() {
   }
 
   return (
-    <section className="py-16 md:py-24 bg-luxury-900 w-full">
-      <div className="w-full px-4 md:px-8 lg:px-12">
-        <div className="max-w-3xl mx-auto text-center">
+    <section className="w-full max-w-none px-0 mx-0 py-16 md:py-24 bg-luxury-900">
+      <div className="w-full px-0 mx-0">
+        <div className="w-full text-center">
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-white mb-4">
             Stay Updated
           </h2>

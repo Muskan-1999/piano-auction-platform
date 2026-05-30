@@ -35,14 +35,14 @@ const FEATURES = [
 
 export default function WhyChooseUsSection() {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-r from-luxury-50 to-luxury-100 w-full">
-      <div className="w-full px-4 md:px-8 lg:px-12">
+    <section className="w-full max-w-none px-0 mx-0 py-16 md:py-24 bg-gradient-to-r from-luxury-50 to-luxury-100">
+      <div className="w-full px-0 mx-0">
         <div className="text-center mb-16">
           <p className="text-luxury-500 font-semibold tracking-widest uppercase text-sm mb-2">Why Choose Us</p>
           <h2 className="font-heading text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             The Premier Piano Auction Platform
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600">
             Trusted by musicians, collectors, and institutions for uncompromising quality and integrity
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function WhyChooseUsSection() {
 
         {/* Testimonial */}
         <div className="mt-16 bg-white rounded-lg p-8 md:p-12 shadow-luxury text-center">
-          <div className="max-w-3xl mx-auto">
+          <div className="w-full">
             <div className="text-5xl mb-4 text-luxury-500">"</div>
             <p className="text-xl text-gray-700 mb-6 leading-relaxed">
               I've been bidding at premier piano auctions for 15 years, and this platform offers the finest
