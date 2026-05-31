@@ -18,7 +18,10 @@ class BiddingController extends Controller
             'last_name' => 'required|string',
             'email' => 'required|email',
             'phone' => 'required|string',
-            'agree_terms' => 'accepted',
+            'address' => 'required|string',
+            'postcode' => 'required|string',
+            'country' => 'required|string',
+            'lot_numbers' => 'required|array|min:1',
         ]);
 
         if ($v->fails()) {
@@ -34,12 +37,11 @@ class BiddingController extends Controller
             'address' => $request->address,
             'postcode' => $request->postcode,
             'country' => $request->country,
-            'lot_numbers' => is_array($request->lot_numbers) ? json_encode($request->lot_numbers) : $request->lot_numbers,
-            'description' => $request->descriptions ?? null,
+            'lot_numbers' => json_encode($request->lot_numbers),
+            'description' => null,
             'extra_data' => [
-                'alternate_phone' => $request->alternate_phone,
                 'preferred_call_time' => $request->preferred_call_time,
-                'one_item_only' => (bool) $request->one_item_only,
+                'one_piano_only' => $request->one_piano_only === 'yes',
                 'notes' => $request->notes,
             ],
         ]);
@@ -50,10 +52,14 @@ class BiddingController extends Controller
     public function absentee(Request $request)
     {
         $v = Validator::make($request->all(), [
-            'first_name' => 'nullable|string',
-            'email' => 'nullable|email',
-            'lots' => 'required|array|min:1',
-            'agree_terms' => 'accepted',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'email' => 'required|email',
+            'phone' => 'required|string',
+            'address' => 'required|string',
+            'postcode' => 'required|string',
+            'country' => 'required|string',
+            'lot_numbers' => 'required|array|min:1',
         ]);
 
         if ($v->fails()) {
@@ -69,11 +75,11 @@ class BiddingController extends Controller
             'address' => $request->address,
             'postcode' => $request->postcode,
             'country' => $request->country,
-            'lot_numbers' => json_encode($request->lots),
-            'description' => $request->descriptions ?? null,
+            'lot_numbers' => json_encode($request->lot_numbers),
+            'description' => null,
             'extra_data' => [
                 'currency' => $request->currency ?? 'GBP',
-                'one_item_only' => (bool) $request->one_item_only,
+                'one_piano_only' => $request->one_piano_only === 'yes',
                 'notes' => $request->notes,
             ],
         ]);

@@ -14,11 +14,15 @@ class BidService
     public function placeBid(Lot $lot, User $user, float $amount, string $bidType, ?string $ipAddress = null, ?string $userAgent = null): Bid
     {
         if (! $lot->canAcceptBids()) {
-            throw new \Exception('This lot cannot accept bids.');
+            throw new \Exception('This lot cannot accept bids at this time.');
+        }
+
+        if (! $user->isAdmin() && ! $user->hasApprovedAuctionRegistration($lot->auction_id)) {
+            throw new \Exception('You must register and be approved to bid on this auction.');
         }
 
         if ($amount <= $lot->current_bid) {
-            throw new \Exception('Bid amount must be greater than current bid.');
+            throw new \Exception('Bid amount must be greater than the current bid of £' . number_format($lot->current_bid, 2) . '.');
         }
 
         if ($lot->bid_increment > 0) {
@@ -84,7 +88,7 @@ class BidService
 
     public function getUserBids(User $user, int $perPage = 20)
     {
-        return Bid::with('lot')
+        return Bid::with('lot.auction')
             ->where('user_id', $user->id)
             ->orderByDesc('placed_at')
             ->paginate($perPage);

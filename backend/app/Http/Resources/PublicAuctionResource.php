@@ -22,6 +22,7 @@ class PublicAuctionResource extends JsonResource
             'location' => $this->location,
             'is_featured' => $this->is_featured,
             'is_live' => $this->is_live,
+            'catalogue_pdf_url' => $this->catalogue_pdf_url,
             'visible_lot_count' => $this->lots_count ?? null,
             'time_until_start' => $this->start_time ? max(0, now()->diffInSeconds($this->start_time, false)) : null,
             'time_until_end' => $this->end_time ? max(0, now()->diffInSeconds($this->end_time, false)) : null,

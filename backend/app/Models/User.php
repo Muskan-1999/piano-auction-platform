@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use App\Models\AuctionRegistration;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmailContract
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmail;
 
     public const ROLE_ADMIN = 'admin';
     public const ROLE_BIDDER = 'bidder';
@@ -71,5 +74,18 @@ class User extends Authenticatable
         $roles = is_array($roles) ? $roles : explode('|', $roles);
 
         return in_array($this->role, $roles, true);
+    }
+
+    public function auctionRegistrations(): HasMany
+    {
+        return $this->hasMany(AuctionRegistration::class);
+    }
+
+    public function hasApprovedAuctionRegistration(int $auctionId): bool
+    {
+        return $this->auctionRegistrations()
+            ->where('auction_id', $auctionId)
+            ->where('status', AuctionRegistration::STATUS_APPROVED)
+            ->exists();
     }
 }

@@ -22,6 +22,7 @@ class AuctionResource extends JsonResource
             'location' => $this->location,
             'is_featured' => $this->is_featured,
             'is_live' => $this->is_live,
+            'catalogue_pdf_url' => $this->catalogue_pdf_url,
             'created_by' => $this->created_by,
             'creator' => new UserResource($this->whenLoaded('creator')),
             'created_at' => $this->created_at?->toDateTimeString(),

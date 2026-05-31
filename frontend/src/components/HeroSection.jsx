@@ -1,96 +1,125 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
+/**
+ * HeroSection
+ *
+ * Full-screen cinematic hero with a looping MP4 background.
+ * The video file is served from /public/videos/hero-auction.mp4
+ * (Vite exposes public/ at the root, so the URL is /videos/hero-auction.mp4).
+ *
+ * Overlay: rgba(0,0,0,0.55) — keeps text readable while letting the
+ * video atmosphere through.
+ *
+ * Performance:
+ *   - preload="none" defers network cost until the browser is idle
+ *   - poster image prevents a flash of black before the first frame
+ *   - playsinline prevents iOS from full-screening the video
+ */
 export default function HeroSection() {
+  const videoRef = useRef(null)
+
+  // Attempt autoplay; browsers sometimes block it — muted + autoPlay attr handles most cases
+  useEffect(() => {
+    const v = videoRef.current
+    if (v) {
+      v.play().catch(() => {
+        // Silently ignore — video will just stay on the poster frame
+      })
+    }
+  }, [])
+
   return (
-    <section className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Background Image */}
+    <section className="relative w-full h-screen overflow-hidden bg-black">
+
+      {/* ── Video background ───────────────────────────────────────────── */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        className="absolute inset-0 h-full w-full object-cover"
+        aria-hidden="true"
+      >
+        <source src="/videos/hero-auction.mp4" type="video/mp4" />
+        {/* Fallback: browser that can't play video sees the poster */}
+      </video>
+
+      {/* ── Dark overlay rgba(0,0,0,0.55) ──────────────────────────────── */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-40"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=1200&h=800&fit=crop)',
-          backgroundAttachment: 'fixed',
-        }}
-      ></div>
+        className="absolute inset-0"
+        style={{ background: 'rgba(0,0,0,0.55)' }}
+      />
 
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50"></div>
+      {/* ── Centred hero content ───────────────────────────────────────── */}
+      <div className="relative flex h-full w-full flex-col items-center justify-center px-4 text-center text-white">
 
-      {/* Content */}
-      <div className="relative w-full h-full flex items-center">
-        <div className="w-full max-w-none px-0 mx-0 py-16 md:py-0">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center h-full px-6 md:px-8 lg:px-16">
-            <div className="text-white">
-              <div className="text-sm text-yellow-500 mb-4 flex flex-wrap gap-2">
-                <Link to="/" className="hover:underline">Home</Link>
-                <span>›</span>
-                <span>Buying A Piano</span>
-              </div>
+        {/* Brand label */}
+        <p
+          className="mb-4 text-xs font-semibold uppercase tracking-[0.35em] text-yellow-400"
+          style={{ animation: 'fadeUp 0.7s ease both' }}
+        >
+          Piano Auctions Ltd
+        </p>
 
-              <div className="text-sm font-semibold tracking-widest text-yellow-600 mb-4 uppercase">
-                BUY A PIANO TODAY
-              </div>
+        {/* Main headline */}
+        <h1
+          className="max-w-4xl font-serif text-5xl font-bold leading-tight text-white md:text-6xl lg:text-7xl"
+          style={{ animation: 'fadeUp 0.9s ease 0.1s both' }}
+        >
+          World Leading Specialist Piano Auction
+        </h1>
 
-              <h1 className="font-heading text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Buy A Piano At Auction
-              </h1>
+        {/* Sub-heading */}
+        <p
+          className="mt-5 text-base font-medium text-gray-300 md:text-lg"
+          style={{ animation: 'fadeUp 0.9s ease 0.2s both' }}
+        >
+          Our Next Auction: 23rd June 2026
+        </p>
 
-              <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
-                Buy your piano at auction with our trusted experts. We have a full range of piano brands to buy, view our latest piano auction catalogue.
-              </p>
+        {/* CTA row */}
+        <div
+          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          style={{ animation: 'fadeUp 0.9s ease 0.3s both' }}
+        >
+          <Link
+            to="/auction-portal"
+            className="inline-flex items-center gap-2 rounded-full bg-yellow-500 px-8 py-3.5 text-sm font-bold text-black transition hover:bg-yellow-400"
+          >
+            <span>🇬🇧</span> Bid Now
+          </Link>
+          <Link
+            to="/buying-a-piano"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-white/70 px-8 py-3.5 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+          >
+            View Catalogue
+          </Link>
+        </div>
 
-              <div className="flex flex-wrap gap-6 text-sm md:text-base">
-                <a
-                  href="#"
-                  className="text-yellow-500 hover:text-yellow-400 underline font-medium transition-colors"
-                >
-                  Upright Pianos
-                </a>
-                <a
-                  href="#"
-                  className="text-yellow-500 hover:text-yellow-400 underline font-medium transition-colors"
-                >
-                  Grand Pianos
-                </a>
-                <a
-                  href="#"
-                  className="text-yellow-500 hover:text-yellow-400 underline font-medium transition-colors"
-                >
-                  Piano Brands
-                </a>
-              </div>
-            </div>
-
-            <div className="flex justify-center lg:justify-end">
-              <div className="bg-white rounded-[32px] shadow-[0_30px_80px_rgba(0,0,0,0.18)] p-8 md:p-10 w-full">
-                <h2 className="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                  Register To Bid
-                </h2>
-                <p className="text-gray-700 mb-8 leading-relaxed">
-                  Bid for your favourite piano or watch the latest auction live with{' '}
-                  <a href="#" className="font-semibold hover:underline">
-                    easyliveauction.com
-                  </a>
-                </p>
-                <div className="space-y-4">
-                  <Link
-                    to="/contact"
-                    className="w-full inline-flex border-2 border-gray-900 bg-white text-gray-900 font-semibold py-4 rounded-[18px] hover:bg-gray-900 hover:text-white transition-colors duration-300 items-center justify-center gap-3"
-                  >
-                    <span>🇬🇧</span>
-                    UK - BID NOW
-                  </Link>
-                  <Link to="/bidding" className="w-full border-2 border-gray-900 text-gray-900 font-semibold py-4 rounded-[18px] hover:bg-gray-900 hover:text-white transition-colors duration-300 inline-flex items-center justify-center">
-                    OTHER WAYS TO BID
-                  </Link>
-                </div>
-              </div>
-            </div>
+        {/* Scroll indicator */}
+        <div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          style={{ animation: 'fadeUp 1s ease 0.5s both' }}
+        >
+          <div className="flex flex-col items-center gap-1.5 text-white/50">
+            <span className="text-[10px] uppercase tracking-widest">Scroll</span>
+            <svg className="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
         </div>
       </div>
+
+      {/* ── Keyframe animations (inline so no external CSS file needed) ── */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0);    }
+        }
+      `}</style>
     </section>
   )
 }
-  
-

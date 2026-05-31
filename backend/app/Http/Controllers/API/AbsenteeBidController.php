@@ -10,6 +10,7 @@ use App\Http\Requests\AbsenteeBid\UpdateAbsenteeBidRequest;
 use App\Http\Resources\AbsenteeBidCollection;
 use App\Http\Resources\AbsenteeBidResource;
 use App\Models\AbsenteeBid;
+use App\Models\Lot;
 use App\Services\AbsenteeBidService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,24 @@ class AbsenteeBidController extends Controller
     public function store(StoreAbsenteeBidRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $bid = $this->absenteeBidService->create($data, $request->user());
+        $lot = Lot::where('lot_number', $data['lot_number'])->firstOrFail();
+
+        $bid = $this->absenteeBidService->create([
+            'lot_id' => $lot->id,
+            'guest_name' => trim($data['first_name'] . ' ' . $data['last_name']),
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'address_1' => $data['address'],
+            'address_2' => $data['address_2'] ?? null,
+            'city' => $data['city'] ?? '',
+            'postcode' => $data['postcode'],
+            'country' => $data['country'],
+            'lot_description' => $data['description'],
+            'max_bid_per_lot' => $data['max_bid_per_lot'],
+            'currency' => $data['currency'],
+            'one_piano_only' => $data['one_piano_only'] === 'yes',
+            'additional_notes' => $data['additional_notes'] ?? null,
+        ], $request->user());
 
         return response()->json([
             'success' => true,

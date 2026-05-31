@@ -9,6 +9,7 @@ use App\Http\Requests\TelephoneBid\StoreTelephoneBidRequest;
 use App\Http\Requests\TelephoneBid\UpdateTelephoneBidRequest;
 use App\Http\Resources\TelephoneBidCollection;
 use App\Http\Resources\TelephoneBidResource;
+use App\Models\Lot;
 use App\Models\TelephoneBid;
 use App\Services\TelephoneBidService;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +31,23 @@ class TelephoneBidController extends Controller
     public function store(StoreTelephoneBidRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $bid = $this->telephoneBidService->create($data, $request->user());
+        $lot = Lot::where('lot_number', $data['lot_number'])->firstOrFail();
+
+        $bid = $this->telephoneBidService->create([
+            'lot_id' => $lot->id,
+            'guest_name' => trim($data['first_name'] . ' ' . $data['last_name']),
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'address_1' => $data['address'],
+            'address_2' => $data['address_2'] ?? null,
+            'city' => $data['city'] ?? '',
+            'postcode' => $data['postcode'],
+            'country' => $data['country'],
+            'lot_description' => $data['description'],
+            'preferred_call_time' => $data['preferred_call_time'] ?? null,
+            'one_piano_only' => $data['one_piano_only'] === 'yes',
+            'additional_notes' => $data['additional_notes'] ?? null,
+        ], $request->user());
 
         return response()->json([
             'success' => true,

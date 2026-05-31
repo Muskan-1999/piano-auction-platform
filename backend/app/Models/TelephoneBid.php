@@ -28,6 +28,10 @@ class TelephoneBid extends Model
         'postcode',
         'country',
         'max_bid_amount',
+        'preferred_call_time',
+        'one_piano_only',
+        'additional_notes',
+        'lot_description',
         'status',
         'notes',
         'approved_by',
@@ -35,6 +39,7 @@ class TelephoneBid extends Model
 
     protected $casts = [
         'max_bid_amount' => 'float',
+        'one_piano_only' => 'boolean',
     ];
 
     public function lot(): BelongsTo

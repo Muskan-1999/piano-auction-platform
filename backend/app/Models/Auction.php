@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AuctionRegistration;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
@@ -26,6 +27,7 @@ class Auction extends Model
         'slug',
         'description',
         'banner_image',
+        'catalogue_pdf',
         'auction_type',
         'start_time',
         'end_time',
@@ -70,6 +72,16 @@ class Auction extends Model
     public function lots(): HasMany
     {
         return $this->hasMany(Lot::class);
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(AuctionRegistration::class);
+    }
+
+    public function getCataloguePdfUrlAttribute(): ?string
+    {
+        return $this->catalogue_pdf ? url('storage/' . $this->catalogue_pdf) : null;
     }
 
     public function scopeLive($query)

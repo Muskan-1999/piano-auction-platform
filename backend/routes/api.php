@@ -11,8 +11,21 @@ use App\Http\Controllers\API\Public\LotController as PublicLotController;
 use App\Http\Controllers\API\Public\SearchController as PublicSearchController;
 use App\Http\Controllers\API\ContactUsController;
 use App\Http\Controllers\API\TelephoneBidController;
+use App\Http\Controllers\API\AuctionRegistrationController;
 use App\Http\Controllers\API\BiddingController;
+use App\Http\Controllers\API\WatchlistController;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+
+// Must live outside the 'api.' name group so Laravel resolves it as 'verification.verify' exactly
+Route::get('email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware('signed')
+    ->name('verification.verify');
+
+// Broadcasting auth — must use Sanctum token auth, exposed under /api prefix
+Route::post('/broadcasting/auth', function (\Illuminate\Http\Request $request) {
+    return Broadcast::auth($request);
+})->middleware('auth:sanctum');
 
 Route::name('api.')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
@@ -41,17 +54,28 @@ Route::name('api.')->group(function () {
     Route::get('public/search', [PublicSearchController::class, 'index']);
 
     Route::post('contact', [ContactUsController::class, 'store']);
-    Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
-    Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);
-
-    // New bidding endpoints
-    Route::post('bidding/telephone', [BiddingController::class, 'telephone']);
-    Route::post('bidding/absentee', [BiddingController::class, 'absentee']);
-    Route::post('bidding/online', [BiddingController::class, 'online']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
+        Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);
+
+        // New bidding endpoints
+        Route::post('bidding/telephone', [BiddingController::class, 'telephone']);
+        Route::post('bidding/absentee', [BiddingController::class, 'absentee']);
+        Route::post('bidding/online', [BiddingController::class, 'online']);
+
         Route::post('lots/{lot}/bid', [\App\Http\Controllers\API\BidController::class, 'store']);
         Route::get('user/bids', [\App\Http\Controllers\API\BidController::class, 'userBids']);
+        Route::get('user/auction-registrations', [AuctionRegistrationController::class, 'userRegistrations']);
+
+        Route::get('watchlist', [WatchlistController::class, 'index']);
+        Route::get('watchlist/check/{lot}', [WatchlistController::class, 'check']);
+        Route::post('watchlist/{lot}', [WatchlistController::class, 'store']);
+        Route::delete('watchlist/{lot}', [WatchlistController::class, 'destroy']);
+
+        Route::post('email/verification-notification', [AuthController::class, 'resendVerification']);
+        Route::post('auction-registrations', [AuctionRegistrationController::class, 'store']);
+        Route::get('auction-registrations/check/{auction}', [AuctionRegistrationController::class, 'check']);
     });
 
     Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
@@ -75,6 +99,10 @@ Route::name('api.')->group(function () {
         Route::post('absentee-bids/{absenteeBid}/approve', [AbsenteeBidController::class, 'approve']);
         Route::post('absentee-bids/{absenteeBid}/reject', [AbsenteeBidController::class, 'reject']);
         Route::patch('absentee-bids/{absenteeBid}', [AbsenteeBidController::class, 'update']);
+
+        Route::get('auction-registrations', [AuctionRegistrationController::class, 'index']);
+        Route::post('auction-registrations/{auctionRegistration}/approve', [AuctionRegistrationController::class, 'approve']);
+        Route::post('auction-registrations/{auctionRegistration}/reject', [AuctionRegistrationController::class, 'reject']);
     });
 
     Route::middleware(['auth:sanctum'])->group(function () {

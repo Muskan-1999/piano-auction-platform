@@ -30,13 +30,15 @@ class Bid extends Model
         'user_agent',
         'placed_at',
         'is_winning',
+        'is_winner',
         'is_live_bid',
     ];
 
     protected $casts = [
-        'amount' => 'float',
-        'placed_at' => 'datetime',
+        'amount'     => 'float',
+        'placed_at'  => 'datetime',
         'is_winning' => 'boolean',
+        'is_winner'  => 'boolean',
         'is_live_bid' => 'boolean',
     ];
 

@@ -2,14 +2,17 @@
 
 namespace App\Filament\Resources\Lots\Tables;
 
+use App\Models\Lot;
+use App\Services\LotSaleService;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 
 class LotsTable
 {
@@ -17,6 +20,10 @@ class LotsTable
     {
         return $table
             ->columns([
+                TextColumn::make('lot_number')
+                    ->label('Lot #')
+                    ->sortable(),
+
                 TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
@@ -26,70 +33,82 @@ class LotsTable
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('lot_number')
-                    ->label('Lot #')
-                    ->sortable(),
-
                 TextColumn::make('brand')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('starting_bid')
-                    ->label('Starting Bid')
-                    ->money('USD')
-                    ->sortable(),
-
                 TextColumn::make('current_bid')
                     ->label('Current Bid')
-                    ->money('USD')
+                    ->formatStateUsing(fn ($state) => $state ? '£' . number_format($state, 0) : '—')
                     ->sortable(),
 
-                BadgeColumn::make('status')
+                TextColumn::make('winning_bid_amount')
+                    ->label('Sold For')
+                    ->formatStateUsing(fn ($state) => $state ? '£' . number_format($state, 0) : '—')
+                    ->sortable(),
+
+                TextColumn::make('winner.name')
+                    ->label('Winner')
+                    ->default('—')
+                    ->searchable(),
+
+                TextColumn::make('status')
+                    ->badge()
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->colors([
-                        'secondary' => 'draft',
-                        'info' => 'published',
-                        'success' => 'live',
-                        'warning' => 'sold',
-                        'danger' => 'unsold',
-                        'gray' => 'withdrawn',
-                    ])
+                    ->color(fn (string $state): string => match ($state) {
+                        'live'      => 'success',
+                        'sold'      => 'warning',
+                        'published' => 'info',
+                        'unsold'    => 'danger',
+                        'withdrawn' => 'gray',
+                        default     => 'secondary',
+                    })
                     ->sortable(),
 
                 IconColumn::make('is_active')
                     ->boolean()
                     ->label('Active'),
-
-                TextColumn::make('ends_at')
-                    ->label('Ends')
-                    ->dateTime()
-                    ->sortable(),
             ])
+            ->defaultSort('lot_number')
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
+                        'draft'     => 'Draft',
                         'published' => 'Published',
-                        'live' => 'Live',
-                        'sold' => 'Sold',
-                        'unsold' => 'Unsold',
+                        'live'      => 'Live',
+                        'sold'      => 'Sold',
+                        'unsold'    => 'Unsold',
                         'withdrawn' => 'Withdrawn',
                     ]),
 
                 SelectFilter::make('auction_id')
                     ->label('Auction')
                     ->relationship('auction', 'title'),
-
-                SelectFilter::make('condition')
-                    ->options([
-                        'excellent' => 'Excellent',
-                        'good' => 'Good',
-                        'fair' => 'Fair',
-                        'poor' => 'Poor',
-                        'unknown' => 'Unknown',
-                    ]),
             ])
             ->recordActions([
+                // Mark as Sold — only visible for live lots
+                Action::make('mark_sold')
+                    ->label('Mark as Sold')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('warning')
+                    ->visible(fn (Lot $record): bool => $record->status === Lot::STATUS_LIVE)
+                    ->requiresConfirmation()
+                    ->modalHeading('Mark Lot as Sold')
+                    ->modalDescription(fn (Lot $record): string =>
+                        "Mark Lot {$record->lot_number} \"{$record->title}\" as SOLD? "
+                        . "The highest bidder will be recorded as the winner and a notification email will be sent."
+                    )
+                    ->modalSubmitActionLabel('Mark as Sold')
+                    ->action(function (Lot $record) {
+                        app(LotSaleService::class)->markAsSold($record);
+
+                        Notification::make()
+                            ->title('Lot marked as sold')
+                            ->body("Lot {$record->lot_number} has been sold. Winner email dispatched.")
+                            ->success()
+                            ->send();
+                    }),
+
                 EditAction::make(),
             ])
             ->toolbarActions([

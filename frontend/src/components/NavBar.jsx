@@ -28,9 +28,12 @@ export default function NavBar() {
             </Link>
 
             <div className="group relative">
-              <button className="text-gray-700 hover:text-luxury-600 font-medium text-sm transition-colors">
+              <Link
+                to="/buying-a-piano"
+                className="text-gray-700 hover:text-luxury-600 font-medium text-sm transition-colors"
+              >
                 Buy A Piano
-              </button>
+              </Link>
               <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3">
                 <Link to="/lots" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Upright Pianos</Link>
                 <Link to="/lots" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Grand Pianos</Link>

@@ -28,6 +28,11 @@ class AbsenteeBid extends Model
         'postcode',
         'country',
         'max_bid_amount',
+        'max_bid_per_lot',
+        'currency',
+        'one_piano_only',
+        'additional_notes',
+        'lot_description',
         'status',
         'notes',
         'approved_by',
@@ -35,6 +40,8 @@ class AbsenteeBid extends Model
 
     protected $casts = [
         'max_bid_amount' => 'float',
+        'max_bid_per_lot' => 'float',
+        'one_piano_only' => 'boolean',
     ];
 
     public function lot(): BelongsTo

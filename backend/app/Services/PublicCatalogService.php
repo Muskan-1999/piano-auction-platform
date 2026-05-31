@@ -13,11 +13,14 @@ class PublicCatalogService
     private array $visibleAuctionStatuses = [
         Auction::STATUS_UPCOMING,
         Auction::STATUS_LIVE,
+        Auction::STATUS_ENDED,
     ];
 
     private array $visibleLotStatuses = [
         Lot::STATUS_PUBLISHED,
         Lot::STATUS_LIVE,
+        Lot::STATUS_SOLD,
+        Lot::STATUS_UNSOLD,
     ];
 
     public function getHomepageData(int $auctionLimit = 4, int $lotLimit = 8): array
@@ -25,7 +28,7 @@ class PublicCatalogService
         $featuredAuctions = Auction::query()
             ->where('is_featured', true)
             ->whereIn('status', $this->visibleAuctionStatuses)
-            ->withCount(['lots' => function (Builder $query) {
+            ->withCount(['lots' => function ($query) {
                 $query->whereIn('status', $this->visibleLotStatuses)
                     ->where('is_active', true);
             }])
@@ -36,7 +39,7 @@ class PublicCatalogService
         $featuredLots = Lot::query()
             ->whereIn('status', $this->visibleLotStatuses)
             ->where('is_active', true)
-            ->whereHas('auction', function (Builder $query) {
+            ->whereHas('auction', function ($query) {
                 $query->where('is_featured', true)
                     ->whereIn('status', $this->visibleAuctionStatuses);
             })
@@ -46,7 +49,7 @@ class PublicCatalogService
             ->get();
 
         $liveAuctions = Auction::live()
-            ->withCount(['lots' => function (Builder $query) {
+            ->withCount(['lots' => function ($query) {
                 $query->where('status', Lot::STATUS_LIVE)
                     ->where('is_active', true);
             }])
@@ -64,7 +67,7 @@ class PublicCatalogService
     public function listAuctions(Request $request, int $perPage = 20): LengthAwarePaginator
     {
         $query = Auction::query()
-            ->withCount(['lots' => function (Builder $query) {
+            ->withCount(['lots' => function ($query) {
                 $query->whereIn('status', $this->visibleLotStatuses)
                     ->where('is_active', true);
             }])
@@ -87,9 +90,9 @@ class PublicCatalogService
         return Auction::query()
             ->where('slug', $slug)
             ->whereIn('status', $this->visibleAuctionStatuses)
-            ->with(['lots' => function (Builder $query) {
+            ->with(['lots' => function ($query) {
                 $query->whereIn('status', $this->visibleLotStatuses)
-                    ->where('is_active', true)
+                    ->withCount('bids')
                     ->orderBy('lot_number');
             }])
             ->firstOrFail();
@@ -99,13 +102,13 @@ class PublicCatalogService
     {
         $query = Auction::query()
             ->live()
-            ->withCount(['lots' => function (Builder $query) {
+            ->withCount(['lots' => function ($query) {
                 $query->where('status', Lot::STATUS_LIVE)
                     ->where('is_active', true);
             }])
             ->with('creator');
 
-        $query->when($request->filled('auction_type'), function (Builder $query) use ($request) {
+        $query->when($request->filled('auction_type'), function ($query) use ($request) {
             $query->where('auction_type', $request->string('auction_type'));
         });
 
@@ -138,7 +141,7 @@ class PublicCatalogService
     {
         $auctions = Auction::query()
             ->whereIn('status', $this->visibleAuctionStatuses)
-            ->withCount(['lots' => function (Builder $query) {
+            ->withCount(['lots' => function ($query) {
                 $query->whereIn('status', $this->visibleLotStatuses)
                     ->where('is_active', true);
             }])
@@ -152,13 +155,13 @@ class PublicCatalogService
         if ($request->filled('q')) {
             $term = '%' . $request->string('q') . '%';
 
-            $auctions->where(function (Builder $query) use ($term) {
+            $auctions->where(function ($query) use ($term) {
                 $query->where('title', 'like', $term)
                     ->orWhere('description', 'like', $term)
                     ->orWhere('location', 'like', $term);
             });
 
-            $lots->where(function (Builder $query) use ($term) {
+            $lots->where(function ($query) use ($term) {
                 $query->where('title', 'like', $term)
                     ->orWhere('description', 'like', $term)
                     ->orWhere('brand', 'like', $term)
@@ -168,7 +171,7 @@ class PublicCatalogService
 
         if ($request->filled('auction_status')) {
             $auctions->where('status', $request->string('auction_status')); 
-            $lots->whereHas('auction', function (Builder $query) use ($request) {
+            $lots->whereHas('auction', function ($query) use ($request) {
                 $query->where('status', $request->string('auction_status'));
             });
         }
@@ -191,7 +194,7 @@ class PublicCatalogService
         ];
     }
 
-    private function applyAuctionFilters(Builder $query, Request $request): void
+    private function applyAuctionFilters($query, Request $request): void
     {
         if ($request->filled('status')) {
             $query->where('status', $request->string('status'));
@@ -212,7 +215,7 @@ class PublicCatalogService
         }
 
         if ($request->filled('min_price')) {
-            $query->whereHas('lots', function (Builder $query) use ($request) {
+            $query->whereHas('lots', function ($query) use ($request) {
                 $query->where('current_bid', '>=', $request->float('min_price'))
                     ->whereIn('status', $this->visibleLotStatuses)
                     ->where('is_active', true);
@@ -220,7 +223,7 @@ class PublicCatalogService
         }
 
         if ($request->filled('max_price')) {
-            $query->whereHas('lots', function (Builder $query) use ($request) {
+            $query->whereHas('lots', function ($query) use ($request) {
                 $query->where('current_bid', '<=', $request->float('max_price'))
                     ->whereIn('status', $this->visibleLotStatuses)
                     ->where('is_active', true);
@@ -229,7 +232,7 @@ class PublicCatalogService
 
         if ($request->filled('q')) {
             $term = '%' . $request->string('q') . '%';
-            $query->where(function (Builder $query) use ($term) {
+            $query->where(function ($query) use ($term) {
                 $query->where('title', 'like', $term)
                     ->orWhere('description', 'like', $term)
                     ->orWhere('location', 'like', $term);
@@ -242,7 +245,7 @@ class PublicCatalogService
         );
     }
 
-    private function applyLotFilters(Builder $query, Request $request): void
+    private function applyLotFilters($query, Request $request): void
     {
         if ($request->filled('status')) {
             $query->where('status', $request->string('status'));
@@ -253,19 +256,19 @@ class PublicCatalogService
         }
 
         if ($request->filled('auction_type')) {
-            $query->whereHas('auction', function (Builder $query) use ($request) {
+            $query->whereHas('auction', function ($query) use ($request) {
                 $query->where('auction_type', $request->string('auction_type'));
             });
         }
 
         if ($request->filled('auction_status')) {
-            $query->whereHas('auction', function (Builder $query) use ($request) {
+            $query->whereHas('auction', function ($query) use ($request) {
                 $query->where('status', $request->string('auction_status'));
             });
         }
 
         if ($request->boolean('featured')) {
-            $query->whereHas('auction', function (Builder $query) {
+            $query->whereHas('auction', function ($query) {
                 $query->where('is_featured', true);
             });
         }
@@ -284,7 +287,7 @@ class PublicCatalogService
 
         if ($request->filled('q')) {
             $term = '%' . $request->string('q') . '%';
-            $query->where(function (Builder $query) use ($term) {
+            $query->where(function ($query) use ($term) {
                 $query->where('title', 'like', $term)
                     ->orWhere('description', 'like', $term)
                     ->orWhere('brand', 'like', $term)
