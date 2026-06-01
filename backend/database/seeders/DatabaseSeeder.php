@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(PianoBrandsSeeder::class);
+
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@pianoauction.test',

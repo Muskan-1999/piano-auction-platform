@@ -92,7 +92,7 @@ export default function HeroSection() {
             <span>🇬🇧</span> Bid Now
           </Link>
           <Link
-            to="/buying-a-piano"
+            to="/buying-piano"
             className="inline-flex items-center gap-2 rounded-full border-2 border-white/70 px-8 py-3.5 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
           >
             View Catalogue

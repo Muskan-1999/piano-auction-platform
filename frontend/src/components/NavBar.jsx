@@ -29,7 +29,7 @@ export default function NavBar() {
 
             <div className="group relative">
               <Link
-                to="/buying-a-piano"
+                to="/buying-piano"
                 className="text-gray-700 hover:text-luxury-600 font-medium text-sm transition-colors"
               >
                 Buy A Piano
@@ -42,7 +42,7 @@ export default function NavBar() {
             </div>
 
             <Link
-              to="/absentee-bid"
+              to="/sell-my-piano"
               className="text-gray-700 hover:text-luxury-600 font-medium text-sm transition-colors"
             >
               Sell My Piano
@@ -117,7 +117,7 @@ export default function NavBar() {
                 <Link to="/lots" className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Piano Brands</Link>
               </div>
               <Link
-                to="/absentee-bid"
+                to="/sell-my-piano"
                 className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 font-medium text-sm"
               >
                 Sell My Piano

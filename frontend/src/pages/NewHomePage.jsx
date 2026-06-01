@@ -233,7 +233,7 @@ const SERVICES = [
   {
     title: 'Buy A Piano',
     body: 'Browse our catalogue of grand and upright pianos to find the perfect instrument to buy from one of our piano auctions.',
-    href: '/buying-a-piano',
+    href: '/buying-piano',
     cta: 'Browse Pianos →',
   },
   {

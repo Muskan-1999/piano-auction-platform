@@ -2,7 +2,8 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import NewHomePage from '../pages/NewHomePage'
-import Home from '../pages/Home'
+import BuyingPianoPage from '../pages/BuyingPianoPage'
+import SellMyPianoPage from '../pages/SellMyPianoPage'
 import Auctions from '../pages/Auctions'
 import AuctionDetail from '../pages/AuctionDetail'
 import LotDetail from '../pages/LotDetail'
@@ -40,8 +41,11 @@ export default function AppRoutes() {
       {/* Homepage — pixel-perfect pianoauctions.co.uk recreation */}
       <Route path="/" element={<MainLayout><NewHomePage /></MainLayout>} />
 
-      {/* Buying A Piano — the original page preserved exactly */}
-      <Route path="/buying-a-piano" element={<MainLayout><Home /></MainLayout>} />
+      {/* New buying piano page — full Piano Auctions Ltd design */}
+      <Route path="/buying-piano" element={<MainLayout><BuyingPianoPage /></MainLayout>} />
+
+      {/* Sell My Piano */}
+      <Route path="/sell-my-piano" element={<MainLayout><SellMyPianoPage /></MainLayout>} />
 
       {/* Public site routes */}
       <Route path="/auctions" element={<MainLayout><Auctions /></MainLayout>} />

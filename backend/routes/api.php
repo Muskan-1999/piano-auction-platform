@@ -14,6 +14,8 @@ use App\Http\Controllers\API\TelephoneBidController;
 use App\Http\Controllers\API\AuctionRegistrationController;
 use App\Http\Controllers\API\BiddingController;
 use App\Http\Controllers\API\WatchlistController;
+use App\Http\Controllers\API\PianoBrandController;
+use App\Http\Controllers\API\SellMyPianoController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
@@ -54,10 +56,14 @@ Route::name('api.')->group(function () {
     Route::get('public/search', [PublicSearchController::class, 'index']);
 
     Route::post('contact', [ContactUsController::class, 'store']);
+    Route::post('sell-my-piano', [SellMyPianoController::class, 'store']);
+
+    Route::get('piano-brands', [PianoBrandController::class, 'index']);
+
+    Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
+    Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
-        Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);
 
         // New bidding endpoints
         Route::post('bidding/telephone', [BiddingController::class, 'telephone']);
