@@ -1,0 +1,63 @@
+name: Branch management guard
+
+on:
+  push:
+    branches:
+      - main
+      - development
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  enforce-safe-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate direct push policy
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "Direct pushes to 'main' are not permitted. Use a pull request from 'development' instead."
+            exit 1
+          fi
+          echo "Branch policy OK: direct pushes are allowed only to 'development' or feature branches."
+
+      - name: Validate PR base branch policy
+        if: github.event_name == 'pull_request'
+        run: |
+          base="${{ github.event.pull_request.base.ref }}"
+          head="${{ github.event.pull_request.head.ref }}"
+          if [[ "$base" != "development" && "$base" != "main" ]]; then
+            echo "Pull requests must target 'development' or 'main'."
+            exit 1
+          fi
+          if [[ "$base" == "main" && "$head" != "development" ]]; then
+            echo "PRs into 'main' should come from 'development' only."
+            exit 1
+          fi
+          echo "PR base branch policy OK."
+
+      - name: Validate commit message prefixes
+        if: github.event_name == 'push'
+        run: |
+          range="${{ github.event.before }}..${{ github.event.after }}"
+          if [[ "$range" == 0000000000000000000000000000000000000000..* ]]; then
+            range="${{ github.event.after }}"
+          fi
+          commits=$(git log --format=%s "$range" 2>/dev/null || true)
+          if [[ -z "$commits" ]]; then
+            echo "No commits to validate."
+            exit 0
+          fi
+          invalid=$(printf '%s
+' "$commits" | grep -Ev '^(feat:|fix:|refactor:|chore:)' || true)
+          if [[ -n "$invalid" ]]; then
+            echo "The following commit messages must use one of: feat:, fix:, refactor:, chore::"
+            printf '%s
+' "$invalid"
+            exit 1
+          fi
+          echo "Commit message prefix validation passed."

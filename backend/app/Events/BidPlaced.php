@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Bid;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BidPlaced implements ShouldBroadcast
+{
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
+    public bool $afterCommit = true;
+
+    public Bid $bid;
+
+    public function __construct(Bid $bid)
+    {
+        // Eager-load user so we can include a masked name in the broadcast
+        $this->bid = $bid->loadMissing('user');
+    }
+
+    public function broadcastOn(): Channel
+    {
+        return new Channel('lots.' . $this->bid->lot_id);
+    }
+
+    public function broadcastWith(): array
+    {
+        $name = $this->bid->user?->name ?? '';
+        $masked = $this->maskName($name);
+
+        return [
+            'bid' => [
+                'id'           => $this->bid->id,
+                'lot_id'       => $this->bid->lot_id,
+                'user_id'      => $this->bid->user_id,
+                'amount'       => $this->bid->amount,
+                'bid_type'     => $this->bid->bid_type,
+                'status'       => $this->bid->status,
+                'placed_at'    => $this->bid->placed_at?->toDateTimeString(),
+                'is_winning'   => $this->bid->is_winning,
+                'bidder_masked'=> $masked,
+            ],
+        ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'bid.placed';
+    }
+
+    private function maskName(string $name): string
+    {
+        if ($name === '') {
+            return 'Bidder';
+        }
+
+        $parts = explode(' ', $name);
+        $first = $parts[0] ?? '';
+        $last  = $parts[count($parts) - 1] ?? '';
+
+        $fl = mb_strtoupper(mb_substr($first, 0, 1));
+        $ll = mb_strtoupper(mb_substr($last,  0, 1));
+
+        return $fl . '***' . ($ll !== $fl ? $ll : '');
+    }
+}

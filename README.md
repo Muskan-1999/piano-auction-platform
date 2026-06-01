@@ -30,6 +30,14 @@ Use clean, conventional commit prefixes for rapid team review:
 - `refactor:` — code refactor without behavior change
 - `chore:` — maintenance, docs, tooling, or setup
 
+## Safe Git workflow
+
+- Use `development` as the active working branch for daily changes.
+- Create pull requests into `development` for review and integration.
+- Merge into `main` only for release-ready snapshots.
+- Never run `git add`, `git commit`, `git push`, branch merge, or branch delete without explicit confirmation.
+- Follow the commit prefixes exactly to keep changes clean and traceable.
+
 ### Examples
 
 - `feat: add auction event listing endpoint`
@@ -42,9 +50,12 @@ Use clean, conventional commit prefixes for rapid team review:
 This project includes a GitHub Actions workflow that runs daily and records a daily check-in file.
 
 - Workflow file: `.github/workflows/daily-commit.yml`
+- Branch guard workflow: `.github/workflows/branch-management.yml`
 - Target branch: `development`
 
 > The workflow commits only when there is a change to `.github/daily-checkin.log`.
+>
+> The branch guard workflow helps enforce safe pushes and commit conventions, while still keeping the repository optimized for MVP development.
 
 ## Setup commands
 

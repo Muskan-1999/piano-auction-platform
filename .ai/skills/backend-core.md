@@ -2,7 +2,7 @@
 
 Rules:
 
-* Use Laravel 12
+* Use Laravel 11
 * Use API-first architecture
 * Use Sanctum authentication
 * Use Filament admin panel

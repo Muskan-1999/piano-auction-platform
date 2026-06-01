@@ -8,7 +8,7 @@ Build an MVP auction platform in 7 days.
 
 Stack:
 
-* Laravel 12 backend
+* Laravel 11 backend
 * React frontend
 * Tailwind CSS
 * Filament admin panel

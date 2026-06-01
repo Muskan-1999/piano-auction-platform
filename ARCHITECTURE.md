@@ -4,7 +4,7 @@
 
 piano-auction/
 │
-├── backend/      → Laravel 12 API Backend
+├── backend/      → Laravel 11 API Backend
 ├── frontend/     → React Frontend
 │
 ├── PROJECT_CONTEXT.md
@@ -16,7 +16,7 @@ piano-auction/
 
 Framework:
 
-* Laravel 12
+* Laravel 11
 
 Purpose:
 
