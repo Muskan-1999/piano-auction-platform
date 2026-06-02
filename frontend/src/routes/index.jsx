@@ -4,6 +4,18 @@ import MainLayout from '../layouts/MainLayout'
 import NewHomePage from '../pages/NewHomePage'
 import BuyingPianoPage from '../pages/BuyingPianoPage'
 import SellMyPianoPage from '../pages/SellMyPianoPage'
+import ValueMyPianoPage from '../pages/ValueMyPianoPage'
+import AboutPage from '../pages/AboutPage'
+import NewsInsightPage from '../pages/NewsInsightPage'
+import FaqPage from '../pages/FaqPage'
+import GrandPianosPage from '../pages/GrandPianosPage'
+import UprightPianosPage from '../pages/UprightPianosPage'
+import PianoDetailPage from '../pages/PianoDetailPage'
+import AuctionCataloguePage from '../pages/AuctionCataloguePage'
+import PastAuctionsPage from '../pages/PastAuctionsPage'
+import PastAuctionDetailPage from '../pages/PastAuctionDetailPage'
+import { grandPianos } from '../data/grandPianos'
+import { uprightPianos } from '../data/uprightPianos'
 import Auctions from '../pages/Auctions'
 import AuctionDetail from '../pages/AuctionDetail'
 import LotDetail from '../pages/LotDetail'
@@ -38,16 +50,59 @@ import PortalVerificationPending from '../pages/auction-portal/PortalVerificatio
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Homepage — pixel-perfect pianoauctions.co.uk recreation */}
+      {/* Homepage */}
       <Route path="/" element={<MainLayout><NewHomePage /></MainLayout>} />
 
-      {/* New buying piano page — full Piano Auctions Ltd design */}
+      {/* Buy A Piano */}
       <Route path="/buying-piano" element={<MainLayout><BuyingPianoPage /></MainLayout>} />
 
-      {/* Sell My Piano */}
+      {/* Sell / Value */}
       <Route path="/sell-my-piano" element={<MainLayout><SellMyPianoPage /></MainLayout>} />
+      <Route path="/value-my-piano" element={<MainLayout><ValueMyPianoPage /></MainLayout>} />
 
-      {/* Public site routes */}
+      {/* ── Shop — Grand Pianos ── */}
+      <Route path="/shop/grand-pianos" element={<MainLayout><GrandPianosPage /></MainLayout>} />
+      <Route
+        path="/shop/grand-pianos/:slug"
+        element={
+          <MainLayout>
+            <PianoDetailPage
+              pianos={grandPianos}
+              type="Grand Piano"
+              backLink="/shop/grand-pianos"
+            />
+          </MainLayout>
+        }
+      />
+
+      {/* ── Shop — Upright Pianos ── */}
+      <Route path="/shop/upright-pianos" element={<MainLayout><UprightPianosPage /></MainLayout>} />
+      <Route
+        path="/shop/upright-pianos/:slug"
+        element={
+          <MainLayout>
+            <PianoDetailPage
+              pianos={uprightPianos}
+              type="Upright Piano"
+              backLink="/shop/upright-pianos"
+            />
+          </MainLayout>
+        }
+      />
+
+      {/* Auction Catalogue */}
+      <Route path="/auction-catalogue" element={<MainLayout><AuctionCataloguePage /></MainLayout>} />
+
+      {/* Past Auctions */}
+      <Route path="/past-auctions" element={<MainLayout><PastAuctionsPage /></MainLayout>} />
+      <Route path="/past-auctions/:slug" element={<MainLayout><PastAuctionDetailPage /></MainLayout>} />
+
+      {/* About / News / FAQ */}
+      <Route path="/about" element={<MainLayout><AboutPage /></MainLayout>} />
+      <Route path="/news-insight" element={<MainLayout><NewsInsightPage /></MainLayout>} />
+      <Route path="/faq" element={<MainLayout><FaqPage /></MainLayout>} />
+
+      {/* Public auction routes */}
       <Route path="/auctions" element={<MainLayout><Auctions /></MainLayout>} />
       <Route path="/auctions/:slug" element={<MainLayout><AuctionDetail /></MainLayout>} />
       <Route path="/lots/:slug" element={<MainLayout><LotDetail /></MainLayout>} />
@@ -64,37 +119,19 @@ export default function AppRoutes() {
         element={<MainLayout><ProtectedRoute><Profile /></ProtectedRoute></MainLayout>}
       />
 
-      {/* Auction Portal — separate layout, no public header/footer */}
+      {/* Auction Portal */}
       <Route path="/auction-portal" element={<AuctionPortalLayout />}>
         <Route index element={<PortalHome />} />
         <Route path="live" element={<PortalLive />} />
         <Route path="upcoming" element={<PortalUpcoming />} />
         <Route path="catalogue" element={<PortalCatalogue />} />
         <Route path="auctions/:slug" element={<PortalAuctionDetail />} />
-        <Route
-          path="register-to-bid/:slug"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><RegisterToBid /></ProtectedRoute>}
-        />
-        <Route
-          path="my-auctions"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalMyAuctions /></ProtectedRoute>}
-        />
-        <Route
-          path="bid-history"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalBidHistory /></ProtectedRoute>}
-        />
-        <Route
-          path="my-bids"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalMyBids /></ProtectedRoute>}
-        />
-        <Route
-          path="watchlist"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalWatchlist /></ProtectedRoute>}
-        />
-        <Route
-          path="account"
-          element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalAccount /></ProtectedRoute>}
-        />
+        <Route path="register-to-bid/:slug" element={<ProtectedRoute redirectTo="/auction-portal/login"><RegisterToBid /></ProtectedRoute>} />
+        <Route path="my-auctions" element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalMyAuctions /></ProtectedRoute>} />
+        <Route path="bid-history" element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalBidHistory /></ProtectedRoute>} />
+        <Route path="my-bids" element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalMyBids /></ProtectedRoute>} />
+        <Route path="watchlist" element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalWatchlist /></ProtectedRoute>} />
+        <Route path="account" element={<ProtectedRoute redirectTo="/auction-portal/login"><PortalAccount /></ProtectedRoute>} />
         <Route path="login" element={<PortalLogin />} />
         <Route path="register" element={<PortalRegister />} />
         <Route path="verify" element={<PortalVerificationPending />} />

@@ -27,11 +27,11 @@ const FOOTER_LINKS = [
   {
     title: 'About',
     links: [
-      { label: 'About Us', href: '#' },
-      { label: 'Guides', href: '#' },
+      { label: 'About Us', href: '/about' },
+      { label: 'News & Insights', href: '/news-insight' },
       { label: 'Deliveries', href: '#' },
       { label: 'Appointments', href: '#' },
-      { label: 'FAQs', href: '#' },
+      { label: 'FAQs', href: '/faq' },
     ],
   },
   {

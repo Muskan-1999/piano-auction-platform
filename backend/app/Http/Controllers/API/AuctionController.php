@@ -87,4 +87,81 @@ class AuctionController extends Controller
 
         return new AuctionCollection($auctions);
     }
+
+    public function upcoming(): JsonResponse
+    {
+        $auction = Auction::upcoming()->with('lots')->first();
+
+        if (!$auction) {
+            return response()->json(['auction' => null, 'message' => 'Catalogue Available Soon.']);
+        }
+
+        return response()->json([
+            'id'            => $auction->id,
+            'title'         => $auction->title,
+            'start_time'    => $auction->start_time,
+            'end_time'      => $auction->end_time,
+            'catalogue_pdf' => $auction->catalogue_pdf
+                                ? asset('storage/' . $auction->catalogue_pdf)
+                                : null,
+            'lots'          => $auction->lots->map(fn ($lot) => [
+                'id'             => $lot->id,
+                'title'          => $lot->title,
+                'slug'           => $lot->slug,
+                'lot_number'     => $lot->lot_number,
+                'brand'          => $lot->brand,
+                'model'          => $lot->model,
+                'year'           => $lot->year,
+                'condition'      => $lot->condition,
+                'starting_bid'   => $lot->starting_bid,
+                'reserve_price'  => $lot->reserve_price,
+                'featured_image' => $lot->featured_image,
+                'gallery'        => $lot->gallery ?? [],
+                'description'    => $lot->description,
+                'status'         => $lot->status,
+            ]),
+        ]);
+    }
+
+    public function downloadCatalogue(): JsonResponse|\Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $auction = Auction::upcoming()->first();
+
+        if (!$auction || !$auction->catalogue_pdf) {
+            return response()->json(['error' => 'No catalogue available.'], 404);
+        }
+
+        $path = storage_path('app/public/' . $auction->catalogue_pdf);
+
+        if (!file_exists($path)) {
+            return response()->json(['error' => 'File not found.'], 404);
+        }
+
+        return response()->download($path);
+    }
+
+    public function past(): JsonResponse
+    {
+        $auctions = Auction::completed()->with('lots')->get();
+
+        return response()->json($auctions->map(fn ($auction) => [
+            'id'         => $auction->id,
+            'title'      => $auction->title,
+            'slug'       => $auction->slug,
+            'start_time' => $auction->start_time,
+            'end_time'   => $auction->end_time,
+            'lots'       => $auction->lots->map(fn ($lot) => [
+                'id'                 => $lot->id,
+                'title'              => $lot->title,
+                'slug'               => $lot->slug,
+                'lot_number'         => $lot->lot_number,
+                'brand'              => $lot->brand,
+                'featured_image'     => $lot->featured_image,
+                'starting_bid'       => $lot->starting_bid,
+                'winning_bid_amount' => $lot->winning_bid_amount,
+                'sold_at'            => $lot->sold_at,
+                'status'             => $lot->status,
+            ]),
+        ]));
+    }
 }

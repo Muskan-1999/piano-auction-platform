@@ -15,7 +15,10 @@ use App\Http\Controllers\API\AuctionRegistrationController;
 use App\Http\Controllers\API\BiddingController;
 use App\Http\Controllers\API\WatchlistController;
 use App\Http\Controllers\API\PianoBrandController;
+use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\SellMyPianoController;
+use App\Http\Controllers\API\ValueMyPianoController;
+use App\Http\Controllers\API\DeliveryQuoteController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +39,9 @@ Route::name('api.')->group(function () {
     Route::post('reset-password', [PasswordResetController::class, 'resetPassword']);
 
     Route::get('auctions', [AuctionController::class, 'index']);
+    Route::get('auctions/upcoming', [AuctionController::class, 'upcoming']);
+    Route::get('auctions/upcoming/download', [AuctionController::class, 'downloadCatalogue']);
+    Route::get('auctions/past', [AuctionController::class, 'past']);
     Route::get('auctions/{auction}', [AuctionController::class, 'show']);
     Route::get('live-auctions', [AuctionController::class, 'liveAuctions']);
 
@@ -57,6 +63,13 @@ Route::name('api.')->group(function () {
 
     Route::post('contact', [ContactUsController::class, 'store']);
     Route::post('sell-my-piano', [SellMyPianoController::class, 'store']);
+    Route::post('value-my-piano', [ValueMyPianoController::class, 'store']);
+    Route::post('delivery-quote', [DeliveryQuoteController::class, 'store']);   // legacy
+    Route::post('delivery-quotes', [DeliveryQuoteController::class, 'store']);
+    Route::get('value-my-piano/options', [ValueMyPianoController::class, 'options']);
+
+    Route::get('blogs', [BlogController::class, 'index']);
+    Route::get('blogs/{slug}', [BlogController::class, 'show']);
 
     Route::get('piano-brands', [PianoBrandController::class, 'index']);
 

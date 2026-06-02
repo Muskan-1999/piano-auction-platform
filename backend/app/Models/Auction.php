@@ -89,6 +89,19 @@ class Auction extends Model
         return $query->where('status', self::STATUS_LIVE);
     }
 
+    public function scopeUpcoming($query)
+    {
+        return $query->where('status', 'published')
+                     ->where('start_time', '>', now())
+                     ->orderBy('start_time', 'asc');
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed')
+                     ->orderBy('start_time', 'desc');
+    }
+
     public function generateSlug(string $title): string
     {
         $slug = Str::slug($title);
