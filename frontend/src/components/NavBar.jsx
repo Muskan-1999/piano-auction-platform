@@ -1,8 +1,23 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  const navLink = (href) =>
+    `block px-4 py-2 text-sm transition-colors ${
+      pathname === href
+        ? 'bg-gray-900 text-white font-semibold'
+        : 'text-gray-700 hover:bg-gray-900 hover:text-white'
+    }`
+
+  const mobileNavLink = (href) =>
+    `block px-3 py-2 rounded text-sm transition-colors ${
+      pathname === href
+        ? 'bg-gray-900 text-white font-semibold'
+        : 'text-gray-700 hover:bg-gray-900 hover:text-white'
+    }`
 
   return (
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -29,10 +44,10 @@ export default function NavBar() {
               <Link to="/buying-piano" className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors">
                 Buy A Piano
               </Link>
-              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3">
-                <Link to="/shop/upright-pianos" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Upright Pianos</Link>
-                <Link to="/shop/grand-pianos"   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Grand Pianos</Link>
-                <Link to="/lots"                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Piano Brands</Link>
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3 overflow-hidden">
+                <Link to="/shop/upright-pianos" className={navLink('/shop/upright-pianos')}>Upright Pianos</Link>
+                <Link to="/shop/grand-pianos"   className={navLink('/shop/grand-pianos')}>Grand Pianos</Link>
+                <Link to="/lots"                className={navLink('/lots')}>Piano Brands</Link>
               </div>
             </div>
 
@@ -44,14 +59,13 @@ export default function NavBar() {
               <span className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors cursor-default">
                 Our Auctions
               </span>
-              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-64 rounded-xl border border-gray-200 bg-white shadow-xl py-3">
-                <Link to="/auction-catalogue"       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Auction Catalogue</Link>
-                <Link to="/auction-calendar"        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Auction Calendar / Dates</Link>
-                <Link to="/viewing-appointments"    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Viewing Appointments</Link>
-                <Link to="/beginners-auction-guide" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Beginners Auction Guide</Link>
-                <Link to="/bidding"                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Bidding</Link>
-                <Link to="/delivery"                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Delivery</Link>
-                <Link to="/past-auctions"           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Past Auctions</Link>
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-64 rounded-xl border border-gray-200 bg-white shadow-xl py-3 overflow-hidden">
+                <Link to="/auction-catalogue"       className={navLink('/auction-catalogue')}>Auction Catalogue</Link>
+                <Link to="/auction-calendar"        className={navLink('/auction-calendar')}>Auction Calendar / Dates</Link>
+                <Link to="/viewing-appointments"    className={navLink('/viewing-appointments')}>Viewing Appointments</Link>
+                <Link to="/beginners-auction-guide" className={navLink('/beginners-auction-guide')}>Beginners Auction Guide</Link>
+                <Link to="/bidding"                 className={navLink('/bidding')}>Bidding</Link>
+                <Link to="/delivery"                className={navLink('/delivery')}>Delivery</Link>
               </div>
             </div>
 
@@ -59,9 +73,9 @@ export default function NavBar() {
               <Link to="/about" className="text-gray-700 hover:text-gray-900 font-medium text-sm transition-colors">
                 About
               </Link>
-              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3">
-                <Link to="/news-insight" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">News &amp; Insights</Link>
-                <Link to="/faq"          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">FAQ</Link>
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3 overflow-hidden">
+                <Link to="/news-insight" className={navLink('/news-insight')}>News &amp; Insights</Link>
+                <Link to="/faq"          className={navLink('/faq')}>FAQ</Link>
               </div>
             </div>
 
@@ -89,29 +103,28 @@ export default function NavBar() {
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
                 <div className="text-sm font-semibold text-gray-800 mb-2">Buy A Piano</div>
-                <Link to="/shop/upright-pianos" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Upright Pianos</Link>
-                <Link to="/shop/grand-pianos"   onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Grand Pianos</Link>
-                <Link to="/lots"                onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Piano Brands</Link>
+                <Link to="/shop/upright-pianos" onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/shop/upright-pianos')}>Upright Pianos</Link>
+                <Link to="/shop/grand-pianos"   onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/shop/grand-pianos')}>Grand Pianos</Link>
+                <Link to="/lots"                onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/lots')}>Piano Brands</Link>
               </div>
 
-              <Link to="/sell-my-piano"  onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 font-medium text-sm">Sell My Piano</Link>
-              <Link to="/value-my-piano" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 font-medium text-sm">Value My Piano</Link>
+              <Link to="/sell-my-piano"  onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/sell-my-piano')}>Sell My Piano</Link>
+              <Link to="/value-my-piano" onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/value-my-piano')}>Value My Piano</Link>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
                 <div className="text-sm font-semibold text-gray-800 mb-2">Our Auctions</div>
-                <Link to="/auction-catalogue"       onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Auction Catalogue</Link>
-                <Link to="/auction-calendar"        onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Auction Calendar / Dates</Link>
-                <Link to="/viewing-appointments"    onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Viewing Appointments</Link>
-                <Link to="/beginners-auction-guide" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Beginners Auction Guide</Link>
-                <Link to="/bidding"                 onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Bidding</Link>
-                <Link to="/delivery"                onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Delivery</Link>
-                <Link to="/past-auctions"           onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">Past Auctions</Link>
+                <Link to="/auction-catalogue"       onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/auction-catalogue')}>Auction Catalogue</Link>
+                <Link to="/auction-calendar"        onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/auction-calendar')}>Auction Calendar / Dates</Link>
+                <Link to="/viewing-appointments"    onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/viewing-appointments')}>Viewing Appointments</Link>
+                <Link to="/beginners-auction-guide" onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/beginners-auction-guide')}>Beginners Auction Guide</Link>
+                <Link to="/bidding"                 onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/bidding')}>Bidding</Link>
+                <Link to="/delivery"                onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/delivery')}>Delivery</Link>
               </div>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="block text-sm font-semibold text-gray-800 mb-2 hover:text-gray-600">About</Link>
-                <Link to="/news-insight" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">News &amp; Insights</Link>
-                <Link to="/faq"          onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 text-sm">FAQ</Link>
+                <Link to="/about" onClick={() => setMobileMenuOpen(false)} className={`block text-sm font-semibold mb-2 ${pathname === '/about' ? 'text-gray-900' : 'text-gray-800 hover:text-gray-600'}`}>About</Link>
+                <Link to="/news-insight" onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/news-insight')}>News &amp; Insights</Link>
+                <Link to="/faq"          onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/faq')}>FAQ</Link>
               </div>
 
               <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="block px-3 py-2 rounded text-gray-700 hover:bg-gray-100 font-medium text-sm">Contact</Link>

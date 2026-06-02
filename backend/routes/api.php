@@ -19,6 +19,8 @@ use App\Http\Controllers\API\BlogController;
 use App\Http\Controllers\API\SellMyPianoController;
 use App\Http\Controllers\API\ValueMyPianoController;
 use App\Http\Controllers\API\DeliveryQuoteController;
+use App\Http\Controllers\API\GuideDownloadController;
+use App\Http\Controllers\API\ViewingAppointmentController;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
@@ -72,6 +74,13 @@ Route::name('api.')->group(function () {
     Route::get('blogs/{slug}', [BlogController::class, 'show']);
 
     Route::get('piano-brands', [PianoBrandController::class, 'index']);
+
+    Route::get('guides/download/{type}', [GuideDownloadController::class, 'download']);
+
+    // Viewing Appointments
+    Route::get('viewing-appointments/available-dates', [ViewingAppointmentController::class, 'availableDates']);
+    Route::get('viewing-appointments/available-slots',  [ViewingAppointmentController::class, 'availableSlots']);
+    Route::post('viewing-appointments',                 [ViewingAppointmentController::class, 'store']);
 
     Route::post('telephone-bids', [TelephoneBidController::class, 'store']);
     Route::post('absentee-bids', [AbsenteeBidController::class, 'store']);

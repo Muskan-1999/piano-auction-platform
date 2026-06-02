@@ -58,7 +58,7 @@ function StepIndicator({ current }) {
   )
 }
 
-export default function DeliveryQuoteForm({ defaultPianoType = 'Grand Piano' }) {
+export default function DeliveryQuoteForm({ defaultPianoType = 'Grand Piano', hideTitle = false }) {
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -111,12 +111,16 @@ export default function DeliveryQuoteForm({ defaultPianoType = 'Grand Piano' }) 
   return (
     <section className="py-16 px-6 lg:px-10 bg-white">
       <div className="max-w-xl mx-auto">
-        <h2 className="text-2xl text-center text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 400 }}>
-          Get A Piano Delivery Quote
-        </h2>
-        <p className="text-sm text-gray-500 text-center mb-10">
-          If you are buying a piano, get a quote to have it delivered.
-        </p>
+        {!hideTitle && (
+          <>
+            <h2 className="text-2xl text-center text-gray-900 mb-2" style={{ fontFamily: 'Georgia, serif', fontWeight: 400 }}>
+              Get A Piano Delivery Quote
+            </h2>
+            <p className="text-sm text-gray-500 text-center mb-10">
+              If you are buying a piano, get a quote to have it delivered.
+            </p>
+          </>
+        )}
 
         <StepIndicator current={step} />
 

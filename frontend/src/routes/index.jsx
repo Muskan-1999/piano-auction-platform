@@ -12,6 +12,8 @@ import GrandPianosPage from '../pages/GrandPianosPage'
 import UprightPianosPage from '../pages/UprightPianosPage'
 import PianoDetailPage from '../pages/PianoDetailPage'
 import AuctionCataloguePage from '../pages/AuctionCataloguePage'
+import AuctionCalendarPage from '../pages/AuctionCalendarPage'
+import BeginnersAuctionGuidePage from '../pages/BeginnersAuctionGuidePage'
 import PastAuctionsPage from '../pages/PastAuctionsPage'
 import PastAuctionDetailPage from '../pages/PastAuctionDetailPage'
 import { grandPianos } from '../data/grandPianos'
@@ -25,6 +27,8 @@ import Register from '../pages/Register'
 import TelephoneBid from '../pages/TelephoneBid'
 import AbsenteeBid from '../pages/AbsenteeBid'
 import ContactPage from '../pages/ContactPage'
+import DeliveryPage from '../pages/DeliveryPage'
+import ViewingAppointmentsPage from '../pages/ViewingAppointmentsPage'
 import BiddingPage from '../pages/BiddingPage'
 import Profile from '../pages/Profile'
 import NotFound from '../pages/NotFound'
@@ -93,9 +97,15 @@ export default function AppRoutes() {
       {/* Auction Catalogue */}
       <Route path="/auction-catalogue" element={<MainLayout><AuctionCataloguePage /></MainLayout>} />
 
+      {/* Auction Calendar */}
+      <Route path="/auction-calendar" element={<MainLayout><AuctionCalendarPage /></MainLayout>} />
+
       {/* Past Auctions */}
       <Route path="/past-auctions" element={<MainLayout><PastAuctionsPage /></MainLayout>} />
       <Route path="/past-auctions/:slug" element={<MainLayout><PastAuctionDetailPage /></MainLayout>} />
+
+      {/* Beginners Auction Guide */}
+      <Route path="/beginners-auction-guide" element={<MainLayout><BeginnersAuctionGuidePage /></MainLayout>} />
 
       {/* About / News / FAQ */}
       <Route path="/about" element={<MainLayout><AboutPage /></MainLayout>} />
@@ -112,6 +122,8 @@ export default function AppRoutes() {
       <Route path="/telephone-bid" element={<MainLayout><TelephoneBid /></MainLayout>} />
       <Route path="/absentee-bid" element={<MainLayout><AbsenteeBid /></MainLayout>} />
       <Route path="/bidding" element={<MainLayout><BiddingPage /></MainLayout>} />
+      <Route path="/delivery" element={<MainLayout><DeliveryPage /></MainLayout>} />
+      <Route path="/viewing-appointments" element={<MainLayout><ViewingAppointmentsPage /></MainLayout>} />
       <Route path="/contact" element={<MainLayout><ContactPage /></MainLayout>} />
       <Route path="/contact-us" element={<MainLayout><ContactPage /></MainLayout>} />
       <Route

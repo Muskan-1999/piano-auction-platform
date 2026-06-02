@@ -1,305 +1,423 @@
-/**
- * AuctionDetail  (/auctions/:slug)
- *
- * Public informational page for an auction.
- * React Query polls every 3 s so the status, lots and bid counts
- * stay fresh without a manual refresh.
- */
-
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { FiCalendar, FiDownload, FiMapPin } from 'react-icons/fi'
-import { MdGavel } from 'react-icons/md'
+import { FiCalendar, FiClock, FiMapPin, FiArrowLeft } from 'react-icons/fi'
+import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa'
 import api from '../api/axios'
-import AuctionStatusBadge from '../components/auction/AuctionStatusBadge'
-import CountdownTimer from '../components/auction/CountdownTimer'
-import WatchlistButton from '../components/auction/WatchlistButton'
+import BlogCard from '../components/news/BlogCard'
 
-function fmt(n) {
-  return '£' + Number(n || 0).toLocaleString('en-GB', { minimumFractionDigits: 0 })
+const FALLBACK_BANNER =
+  'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80'
+
+function formatFullDate(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 }
 
-const PLACEHOLDER =
-  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400"%3E%3Crect width="800" height="400" fill="%230f172a"/%3E%3C/svg%3E'
+function formatTime(iso) {
+  if (!iso) return ''
+  return new Date(iso)
+    .toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLowerCase()
+}
 
-// ─── Lot card (read-only, links to portal) ────────────────────────────────────
-
-function LotCard({ lot, auctionSlug }) {
-  const isSold = lot.status === 'sold'
-  const isLive = lot.status === 'live'
-
+// ─── Loading skeleton ─────────────────────────────────────────────────────────
+function Skeleton() {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 transition hover:border-slate-700">
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-950">
-        <img
-          src={lot.featured_image || PLACEHOLDER}
-          alt={lot.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => { e.target.src = PLACEHOLDER }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" />
-        <div className="absolute left-2 top-2 flex gap-1.5">
-          <span className="rounded bg-slate-950/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-amber-300">
-            Lot {lot.lot_number}
-          </span>
-          {isSold && (
-            <span className="rounded bg-slate-700 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-300">SOLD</span>
-          )}
-          {isLive && !isSold && (
-            <span className="flex items-center gap-1 rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
-              </span>
-              LIVE
-            </span>
-          )}
-        </div>
-        <div className="absolute right-2 top-2">
-          <WatchlistButton lotId={lot.id} size="sm" />
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col p-4">
-        {lot.brand && (
-          <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-amber-400/80">{lot.brand}</p>
-        )}
-        <h3 className="text-sm font-bold text-white">{lot.title}</h3>
-        <div className="mt-3 flex items-end justify-between">
-          <div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500">
-              {(lot.bids_count ?? 0) > 0 ? 'Current Bid' : 'Starting Bid'}
-            </p>
-            <p className="font-mono text-base font-bold text-white">
-              {fmt((lot.bids_count ?? 0) > 0 ? lot.current_bid : lot.starting_bid)}
-            </p>
+    <div className="animate-pulse">
+      <div className="h-[320px] bg-gray-200 w-full mb-10" />
+      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+        <div className="h-3 bg-gray-200 rounded w-28 mb-8" />
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-12">
+          <div className="space-y-4">
+            <div className="h-8 bg-gray-200 rounded w-3/4" />
+            <div className="h-8 bg-gray-200 rounded w-2/3" />
+            <div className="h-3 bg-gray-200 rounded w-1/2 mt-6" />
+            <div className="h-3 bg-gray-200 rounded w-1/2" />
+            <div className="h-3 bg-gray-200 rounded w-2/3" />
           </div>
-          {(lot.bids_count ?? 0) > 0 && (
-            <p className="text-xs text-slate-500">{lot.bids_count} bids</p>
-          )}
+          <div className="space-y-4">
+            <div className="h-4 bg-gray-200 rounded" />
+            <div className="h-4 bg-gray-200 rounded w-5/6" />
+            <div className="h-4 bg-gray-200 rounded w-4/6" />
+            <div className="h-10 bg-gray-200 rounded mt-4" />
+            <div className="h-10 bg-gray-200 rounded" />
+            <div className="h-[280px] bg-gray-200 rounded mt-6" />
+          </div>
         </div>
-
-        <Link
-          to={`/lots/${lot.slug}`}
-          className="mt-4 flex w-full items-center justify-center rounded-xl border border-slate-700 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white"
-        >
-          View Lot
-        </Link>
       </div>
     </div>
   )
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function AuctionDetail() {
   const { slug } = useParams()
 
-  const { data: auction, isLoading } = useQuery({
-    queryKey:        ['public-auction', slug],
-    queryFn:         async () => {
-      const res = await api.get(`/public/auctions/${slug}`)
-      return res.data?.data ?? res.data ?? null
-    },
-    refetchInterval: 3000,
-    enabled:         !!slug,
-  })
+  const [auction, setAuction]       = useState(null)
+  const [loading, setLoading]       = useState(true)
+  const [notFound, setNotFound]     = useState(false)
+  const [allAuctions, setAllAuctions] = useState([])
+  const [blogs, setBlogs]           = useState([])
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!slug) return
+    setLoading(true)
+    setNotFound(false)
+    setAuction(null)
+
+    async function loadAuction() {
+      try {
+        // 1. Try the public endpoint (works for upcoming / live / ended statuses)
+        try {
+          const res = await api.get(`public/auctions/${slug}`)
+          const data = res.data?.data ?? res.data ?? null
+          if (data?.id) {
+            setAuction(data)
+            document.title = `${data.title} | Piano Auctions Ltd`
+            return
+          }
+        } catch (_) {
+          // Public endpoint returned 404 (e.g. auction has status='published')
+          // Fall through to the internal endpoint below
+        }
+
+        // 2. Fallback: search all visible auctions via public endpoint by slug.
+        //    The internal /api/auctions endpoint has a bug where
+        //    $request->string('status') is truthy even when absent, causing
+        //    WHERE status='' which returns no rows.
+        const fallback = await api.get('public/auctions', { params: { per_page: 100 } })
+        const list = fallback.data?.data ?? []
+        const found = list.find((a) => a.slug === slug)
+        if (found) {
+          setAuction(found)
+          document.title = `${found.title} | Piano Auctions Ltd`
+        } else {
+          setNotFound(true)
+        }
+      } catch (_) {
+        setNotFound(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadAuction()
+
+    // Fetch all visible auctions for prev/next navigation
+    api.get('public/auctions', { params: { per_page: 100 } })
+      .then((res) => setAllAuctions(res.data?.data ?? []))
+      .catch(() => {})
+
+    api.get('/blogs')
+      .then((res) => {
+        const list = Array.isArray(res.data) ? res.data : []
+        setBlogs(list.slice(0, 3))
+      })
+      .catch(() => {})
+  }, [slug])
+
+  // ── Prev / Next by sorted start_time ──
+  const sorted = [...allAuctions].sort(
+    (a, b) => new Date(a.start_time) - new Date(b.start_time),
+  )
+  const idx         = sorted.findIndex((a) => a.slug === slug)
+  const prevAuction = idx > 0 ? sorted[idx - 1] : null
+  const nextAuction = idx !== -1 && idx < sorted.length - 1 ? sorted[idx + 1] : null
+
+  // ── Loading ──
+  if (loading) return (
+    <div className="w-full bg-white">
+      <Skeleton />
+    </div>
+  )
+
+  // ── Not found ──
+  if (notFound || !auction) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-slate-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white gap-4">
+        <p className="text-gray-500">Auction not found.</p>
+        <Link
+          to="/auction-calendar"
+          className="text-sm text-gray-900 underline underline-offset-2"
+        >
+          ← Back to All Events
+        </Link>
       </div>
     )
   }
 
-  if (!auction) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-slate-950 text-slate-400">
-        Auction not found.
-      </div>
-    )
-  }
+  const mapQuery = auction.location
+    ? `https://maps.google.com/maps?q=${encodeURIComponent(auction.location)}&output=embed`
+    : null
 
-  const lots    = auction.auction_lots ?? []
-  const isLive  = auction.status === 'live'
-  const isUpcoming = auction.status === 'upcoming'
-  const isEnded = auction.status === 'ended'
-  const portalUrl = `/auction-portal/auctions/${auction.slug}`
+  const shareUrl = encodeURIComponent(window.location.href)
+  const shareTitle = encodeURIComponent(auction.title)
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="w-full bg-white">
 
-      {/* ── Banner ── */}
-      <div className="relative">
-        {auction.banner_image ? (
-          <div className="relative h-[40vh] min-h-[220px] overflow-hidden lg:h-[50vh]">
-            <img
-              src={auction.banner_image}
-              alt={auction.title}
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-slate-950/10" />
-          </div>
-        ) : (
-          <div className="h-32 bg-gradient-to-br from-slate-900 to-slate-950" />
-        )}
+      {/* ── Hero banner ── */}
+      <div
+        className="relative overflow-hidden w-full"
+        style={{ height: 'clamp(240px, 28vw, 360px)' }}
+      >
+        <img
+          src={auction.banner_image || FALLBACK_BANNER}
+          alt={auction.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/25" />
+      </div>
 
-        <div className="absolute inset-0 flex items-end">
-          <div className="mx-auto w-full max-w-screen-xl px-4 pb-8 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-              <div className="max-w-2xl">
-                <AuctionStatusBadge status={auction.status} />
-                <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-                  {auction.title}
-                </h1>
-                {auction.location && (
-                  <p className="mt-2 flex items-center gap-1.5 text-sm text-slate-400">
-                    <FiMapPin className="h-4 w-4" /> {auction.location}
-                  </p>
-                )}
-              </div>
+      {/* ── Main two-column section ── */}
+      <div className="max-w-5xl mx-auto px-6 lg:px-8 py-10">
 
-              {/* CTA */}
-              <div className="flex shrink-0 flex-col items-start gap-2 lg:items-end">
-                {isLive && (
-                  <Link
-                    to={portalUrl}
-                    className="flex items-center gap-2 rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-red-500"
-                  >
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                    </span>
-                    Join Live Auction
-                  </Link>
-                )}
-                {!isEnded && (
-                  <Link
-                    to={`/auction-portal/register-to-bid/${auction.slug}`}
-                    className="rounded-full border border-amber-400/40 bg-amber-400/5 px-5 py-2 text-sm font-semibold text-amber-300 hover:bg-amber-400/10"
-                  >
-                    Register to Bid
-                  </Link>
-                )}
+        {/* Back link */}
+        <Link
+          to="/auction-calendar"
+          className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-900 transition-colors mb-8 group"
+        >
+          <FiArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+          Back to All Events
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10 lg:gap-16">
+
+          {/* ── LEFT COLUMN ── */}
+          <div>
+            <h1
+              className="text-gray-900 leading-tight mb-3"
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontWeight: 400,
+                fontSize: 'clamp(1.75rem, 4vw, 2.4rem)',
+              }}
+            >
+              {auction.title}
+            </h1>
+
+            {/* Breadcrumb */}
+            <nav className="text-[11px] text-gray-400 flex items-center gap-1 flex-wrap mb-8">
+              <Link to="/" className="hover:text-gray-700 transition-colors">Home</Link>
+              <span>»</span>
+              <span className="text-gray-600 truncate max-w-[200px]">{auction.title}</span>
+            </nav>
+
+            {/* Date / Time / Location icons */}
+            <ul className="space-y-3">
+              {auction.start_time && (
+                <li className="flex items-center gap-3 text-sm text-gray-700">
+                  <FiCalendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  {formatFullDate(auction.start_time)}
+                </li>
+              )}
+              {auction.start_time && (
+                <li className="flex items-center gap-3 text-sm text-gray-700">
+                  <FiClock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  Start: {formatTime(auction.start_time)}
+                </li>
+              )}
+              {auction.end_time && (
+                <li className="flex items-center gap-3 text-sm text-gray-700">
+                  <FiClock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  End: {formatTime(auction.end_time)}
+                </li>
+              )}
+              {auction.location && (
+                <li className="flex items-start gap-3 text-sm text-gray-700">
+                  <FiMapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                  {auction.location}
+                </li>
+              )}
+            </ul>
+
+            <hr className="my-8 border-gray-200" />
+
+            {/* Share */}
+            <div>
+              <p className="text-xs text-gray-500 mb-3">Share the Post:</p>
+              <div className="flex items-center gap-4">
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Share on Facebook"
+                  className="text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <FaFacebook className="w-[18px] h-[18px]" />
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Share on Twitter"
+                  className="text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <FaTwitter className="w-[18px] h-[18px]" />
+                </a>
+                <a
+                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Share on LinkedIn"
+                  className="text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  <FaLinkedin className="w-[18px] h-[18px]" />
+                </a>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Content ── */}
-      <div className="mx-auto max-w-screen-xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
-
-          {/* Left: description + lots grid */}
-          <div className="space-y-8">
-
-            {/* Countdown */}
-            {isUpcoming && auction.start_time && (
-              <div className="rounded-2xl border border-amber-400/20 bg-slate-900 p-7">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber-400">Auction Starts In</p>
-                <div className="mt-5">
-                  <CountdownTimer targetDate={auction.start_time} />
-                </div>
-              </div>
+          {/* ── RIGHT COLUMN ── */}
+          <div>
+            {/* Description HTML */}
+            {auction.description && (
+              <div
+                className="auction-event-description text-sm text-gray-700 leading-relaxed mb-8"
+                dangerouslySetInnerHTML={{ __html: auction.description }}
+              />
             )}
 
-            {/* Description */}
-            {auction.description && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-                <h2 className="mb-4 text-sm font-bold uppercase tracking-widest text-slate-400">About This Auction</h2>
-                <div
-                  className="prose prose-sm prose-invert max-w-none text-slate-300"
-                  dangerouslySetInnerHTML={{ __html: auction.description }}
+            {/* CTA block — always visible */}
+            <div className="mb-8">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-900 mb-4">
+                TO BOOK AN APPOINTMENT TO VIEW PLEASE:
+              </p>
+              <div className="flex flex-col gap-3">
+                <Link
+                  to="/auction-catalogue"
+                  className="block border border-gray-900 text-gray-900 text-sm font-medium py-3 px-5 text-center hover:bg-gray-900 hover:text-white transition-colors"
+                >
+                  View Latest Catalogue
+                </Link>
+                <Link
+                  to="/contact"
+                  className="block border border-gray-900 text-gray-900 text-sm font-medium py-3 px-5 text-center hover:bg-gray-900 hover:text-white transition-colors"
+                >
+                  Book an appointment to view
+                </Link>
+              </div>
+            </div>
+
+            {/* Google Map */}
+            {mapQuery && (
+              <div className="w-full overflow-hidden border border-gray-200">
+                <iframe
+                  title="Auction Location Map"
+                  src={mapQuery}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0, display: 'block' }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
               </div>
             )}
-
-            {/* Lots grid */}
-            {lots.length > 0 && (
-              <div>
-                <div className="mb-5 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-white">
-                    Lots
-                    <span className="ml-2 text-sm font-normal text-slate-500">({lots.length})</span>
-                  </h2>
-                  {isLive && (
-                    <div className="flex items-center gap-1.5 text-xs text-red-400">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500" />
-                      </span>
-                      Live bidding active
-                    </div>
-                  )}
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {lots.map((lot) => (
-                    <LotCard key={lot.id} lot={lot} auctionSlug={auction.slug} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right: auction info card */}
-          <div>
-            <div className="sticky top-20 space-y-4">
-              <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
-                <div className="border-b border-slate-800 px-5 py-4">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Auction Details</h3>
-                </div>
-                <div className="space-y-4 p-5 text-sm">
-                  {[
-                    { label: 'Type',    value: auction.auction_type },
-                    { label: 'Start',   value: auction.start_time ? new Date(auction.start_time).toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'TBA' },
-                    { label: 'End',     value: auction.end_time ? new Date(auction.end_time).toLocaleString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'TBA' },
-                    auction.preview_start_time && { label: 'Preview', value: new Date(auction.preview_start_time).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) },
-                    auction.location && { label: 'Location', value: auction.location },
-                    { label: 'Lots',    value: `${lots.length} lots` },
-                  ].filter(Boolean).map((row) => (
-                    <div key={row.label}>
-                      <p className="text-[9px] uppercase tracking-widest text-slate-600">{row.label}</p>
-                      <p className="mt-0.5 capitalize text-slate-200">{row.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Catalogue PDF */}
-              {auction.catalogue_pdf_url ? (
-                <a
-                  href={auction.catalogue_pdf_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/5 p-4 text-amber-300 transition hover:bg-amber-400/10"
-                >
-                  <FiDownload className="h-5 w-5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold">View Catalogue PDF</p>
-                    <p className="text-[10px] text-amber-400/50">Opens in new tab</p>
-                  </div>
-                </a>
-              ) : (
-                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center">
-                  <p className="text-sm text-slate-500">Catalogue Coming Soon</p>
-                </div>
-              )}
-
-              {/* Portal CTA */}
-              <Link
-                to={portalUrl}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-amber-400 py-3 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
-              >
-                <MdGavel className="h-4 w-4" />
-                {isLive ? 'Join Live Auction' : 'View in Auction Portal'}
-              </Link>
-            </div>
           </div>
         </div>
+
+        {/* ── Prev / Next navigation ── */}
+        {(prevAuction || nextAuction) && (
+          <>
+            <hr className="mt-12 mb-6 border-gray-200" />
+            <div className="flex items-start justify-between gap-4 text-sm">
+              {prevAuction ? (
+                <Link
+                  to={`/auctions/${prevAuction.slug}`}
+                  className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors group"
+                >
+                  <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-400">Previous</div>
+                    <div className="font-medium text-gray-800 mt-0.5 line-clamp-1">{prevAuction.title}</div>
+                  </div>
+                </Link>
+              ) : <span />}
+
+              {nextAuction && (
+                <Link
+                  to={`/auctions/${nextAuction.slug}`}
+                  className="flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors group text-right"
+                >
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-400 text-right">Next</div>
+                    <div className="font-medium text-gray-800 mt-0.5 line-clamp-1">{nextAuction.title}</div>
+                  </div>
+                  <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+                </Link>
+              )}
+            </div>
+          </>
+        )}
       </div>
+
+      {/* ── Latest News ── */}
+      {blogs.length > 0 && (
+        <section className="border-t border-gray-100 bg-white py-16 px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <h2
+              className="text-gray-900 mb-10 text-center"
+              style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                fontWeight: 400,
+              }}
+            >
+              Latest News
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {blogs.map((blog) => (
+                <BlogCard key={blog.id} blog={blog} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Description prose styles */}
+      <style>{`
+        .auction-event-description p {
+          margin-bottom: 0.75rem;
+          line-height: 1.7;
+        }
+        .auction-event-description strong,
+        .auction-event-description b {
+          font-weight: 600;
+          color: #111827;
+          display: block;
+          margin-top: 1.25rem;
+          margin-bottom: 0.4rem;
+        }
+        .auction-event-description ul {
+          list-style: disc;
+          padding-left: 1.25rem;
+          margin-bottom: 0.75rem;
+        }
+        .auction-event-description li {
+          margin-bottom: 0.25rem;
+        }
+        .auction-event-description a {
+          color: #16a34a;
+          text-decoration: underline;
+        }
+        .auction-event-description a:hover {
+          color: #15803d;
+        }
+        .auction-event-description h2,
+        .auction-event-description h3 {
+          font-family: Georgia, serif;
+          font-weight: 400;
+          color: #111827;
+          margin-top: 1.5rem;
+          margin-bottom: 0.5rem;
+        }
+      `}</style>
     </div>
   )
 }

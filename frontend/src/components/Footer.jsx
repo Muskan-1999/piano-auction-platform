@@ -30,7 +30,7 @@ const FOOTER_LINKS = [
       { label: 'About Us', href: '/about' },
       { label: 'News & Insights', href: '/news-insight' },
       { label: 'Deliveries', href: '#' },
-      { label: 'Appointments', href: '#' },
+      { label: 'Appointments', href: '/viewing-appointments' },
       { label: 'FAQs', href: '/faq' },
     ],
   },
