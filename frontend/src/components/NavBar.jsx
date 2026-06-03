@@ -47,7 +47,7 @@ export default function NavBar() {
               <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute left-0 mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-xl py-3 overflow-hidden">
                 <Link to="/shop/upright-pianos" className={navLink('/shop/upright-pianos')}>Upright Pianos</Link>
                 <Link to="/shop/grand-pianos"   className={navLink('/shop/grand-pianos')}>Grand Pianos</Link>
-                <Link to="/lots"                className={navLink('/lots')}>Piano Brands</Link>
+                <Link to="/piano-brands"        className={navLink('/piano-brands')}>Piano Brands</Link>
               </div>
             </div>
 
@@ -105,7 +105,7 @@ export default function NavBar() {
                 <div className="text-sm font-semibold text-gray-800 mb-2">Buy A Piano</div>
                 <Link to="/shop/upright-pianos" onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/shop/upright-pianos')}>Upright Pianos</Link>
                 <Link to="/shop/grand-pianos"   onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/shop/grand-pianos')}>Grand Pianos</Link>
-                <Link to="/lots"                onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/lots')}>Piano Brands</Link>
+                <Link to="/piano-brands"        onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/piano-brands')}>Piano Brands</Link>
               </div>
 
               <Link to="/sell-my-piano"  onClick={() => setMobileMenuOpen(false)} className={mobileNavLink('/sell-my-piano')}>Sell My Piano</Link>

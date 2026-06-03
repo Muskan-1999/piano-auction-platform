@@ -30,6 +30,7 @@ import ContactPage from '../pages/ContactPage'
 import DeliveryPage from '../pages/DeliveryPage'
 import ViewingAppointmentsPage from '../pages/ViewingAppointmentsPage'
 import BiddingPage from '../pages/BiddingPage'
+import PianoBrandsPage from '../pages/PianoBrandsPage'
 import Profile from '../pages/Profile'
 import NotFound from '../pages/NotFound'
 import ProtectedRoute from '../components/ProtectedRoute'
@@ -121,6 +122,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
       <Route path="/telephone-bid" element={<MainLayout><TelephoneBid /></MainLayout>} />
       <Route path="/absentee-bid" element={<MainLayout><AbsenteeBid /></MainLayout>} />
+      <Route path="/piano-brands" element={<MainLayout><PianoBrandsPage /></MainLayout>} />
       <Route path="/bidding" element={<MainLayout><BiddingPage /></MainLayout>} />
       <Route path="/delivery" element={<MainLayout><DeliveryPage /></MainLayout>} />
       <Route path="/viewing-appointments" element={<MainLayout><ViewingAppointmentsPage /></MainLayout>} />

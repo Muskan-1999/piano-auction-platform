@@ -296,7 +296,7 @@ export default function AuctionDetail() {
                   View Latest Catalogue
                 </Link>
                 <Link
-                  to="/contact"
+                  to="/viewing-appointments"
                   className="block border border-gray-900 text-gray-900 text-sm font-medium py-3 px-5 text-center hover:bg-gray-900 hover:text-white transition-colors"
                 >
                   Book an appointment to view

@@ -115,7 +115,9 @@ class AuctionController extends Controller
                 'condition'      => $lot->condition,
                 'starting_bid'   => $lot->starting_bid,
                 'reserve_price'  => $lot->reserve_price,
-                'featured_image' => $lot->featured_image,
+                'featured_image' => $lot->featured_image
+                                     ? asset('storage/' . $lot->featured_image)
+                                     : null,
                 'gallery'        => $lot->gallery ?? [],
                 'description'    => $lot->description,
                 'status'         => $lot->status,
@@ -145,18 +147,23 @@ class AuctionController extends Controller
         $auctions = Auction::completed()->with('lots')->get();
 
         return response()->json($auctions->map(fn ($auction) => [
-            'id'         => $auction->id,
-            'title'      => $auction->title,
-            'slug'       => $auction->slug,
-            'start_time' => $auction->start_time,
-            'end_time'   => $auction->end_time,
-            'lots'       => $auction->lots->map(fn ($lot) => [
+            'id'           => $auction->id,
+            'title'        => $auction->title,
+            'slug'         => $auction->slug,
+            'start_time'   => $auction->start_time,
+            'end_time'     => $auction->end_time,
+            'banner_image' => $auction->banner_image
+                                ? asset('storage/' . $auction->banner_image)
+                                : null,
+            'lots'         => $auction->lots->map(fn ($lot) => [
                 'id'                 => $lot->id,
                 'title'              => $lot->title,
                 'slug'               => $lot->slug,
                 'lot_number'         => $lot->lot_number,
                 'brand'              => $lot->brand,
-                'featured_image'     => $lot->featured_image,
+                'featured_image'     => $lot->featured_image
+                                         ? asset('storage/' . $lot->featured_image)
+                                         : null,
                 'starting_bid'       => $lot->starting_bid,
                 'winning_bid_amount' => $lot->winning_bid_amount,
                 'sold_at'            => $lot->sold_at,

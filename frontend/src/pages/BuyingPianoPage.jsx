@@ -60,9 +60,9 @@ const FAQS = [
 ]
 
 const PIANO_CARDS = [
-  { title: 'Grand Pianos',     link: 'View Grand Pianos',   img: IMG.grand },
-  { title: 'Upright Pianos',   link: 'View Upright Pianos', img: IMG.upright },
-  { title: 'All Piano Brands', link: 'View Piano Brands',   img: IMG.brands },
+  { title: 'Grand Pianos',     link: 'View Grand Pianos',   img: IMG.grand,   href: '/shop/grand-pianos' },
+  { title: 'Upright Pianos',   link: 'View Upright Pianos', img: IMG.upright, href: '/shop/upright-pianos' },
+  { title: 'All Piano Brands', link: 'View Piano Brands',   img: IMG.brands,  href: '/piano-brands' },
 ]
 
 // ── Brand carousel sub-components ──────────────────────────────────────────
@@ -228,7 +228,7 @@ export default function BuyingPianoPage() {
               Each piano is checked for sound and condition, so you can bid with confidence. Explore our latest auctions and find the piano that's right for you.
             </p>
             <button
-              onClick={() => navigate('/auction-portal/catalogue')}
+              onClick={() => navigate('/auction-catalogue')}
               className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors"
             >
               VIEW THE LATEST AUCTION CATALOGUE
@@ -256,7 +256,7 @@ export default function BuyingPianoPage() {
               <div
                 key={card.title}
                 className="relative h-72 overflow-hidden group cursor-pointer"
-                onClick={() => navigate('/auction-portal/catalogue')}
+                onClick={() => navigate(card.href)}
               >
                 <img
                   src={card.img}
@@ -314,7 +314,7 @@ export default function BuyingPianoPage() {
           </div>
           <div className="text-center mt-12">
             <button
-              onClick={() => navigate('/auction-portal/catalogue')}
+              onClick={() => navigate('/auction-catalogue')}
               className="bg-black text-white text-xs font-semibold tracking-wider uppercase py-4 px-10 hover:bg-gray-900 transition-colors"
             >
               VIEW AVAILABLE PIANOS TO BUY
@@ -341,7 +341,7 @@ export default function BuyingPianoPage() {
             Explore our latest auction catalogue to see all pianos currently available to bid on. Browse full details, photos and auction dates in one place, and find the perfect piano that's right for you.
           </p>
           <button
-            onClick={() => navigate('/auction-portal/catalogue')}
+            onClick={() => navigate('/auction-catalogue')}
             className="border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors"
           >
             VIEW AVAILABLE PIANOS TO BUY
@@ -370,7 +370,7 @@ export default function BuyingPianoPage() {
               Book a showroom appointment to see the pianos in person before you buy. Get expert guidance, compare models, and find the perfect piano with confidence.
             </p>
             <button
-              onClick={() => navigate('/contact')}
+              onClick={() => navigate('/viewing-appointments')}
               className="border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors"
             >
               BOOK YOUR APPOINTMENT

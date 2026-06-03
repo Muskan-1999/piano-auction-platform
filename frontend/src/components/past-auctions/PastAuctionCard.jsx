@@ -36,8 +36,10 @@ function Placeholder() {
 export default function PastAuctionCard({ auction }) {
   const navigate = useNavigate()
 
-  // Find the first lot that has an image
-  const coverLot = auction.lots?.find((l) => l.featured_image)
+  const coverImage =
+    auction.banner_image ||
+    auction.lots?.find((l) => l.featured_image)?.featured_image ||
+    null
 
   return (
     <div
@@ -49,9 +51,9 @@ export default function PastAuctionCard({ auction }) {
     >
       {/* Image */}
       <div className="w-full aspect-[4/3] overflow-hidden bg-gray-100">
-        {coverLot?.featured_image ? (
+        {coverImage ? (
           <img
-            src={coverLot.featured_image}
+            src={coverImage}
             alt={auction.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"

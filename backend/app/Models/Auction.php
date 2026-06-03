@@ -91,14 +91,14 @@ class Auction extends Model
 
     public function scopeUpcoming($query)
     {
-        return $query->where('status', 'published')
+        return $query->where('status', self::STATUS_UPCOMING)
                      ->where('start_time', '>', now())
                      ->orderBy('start_time', 'asc');
     }
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', 'completed')
+        return $query->where('status', self::STATUS_ENDED)
                      ->orderBy('start_time', 'desc');
     }
 

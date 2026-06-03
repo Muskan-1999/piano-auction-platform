@@ -8,6 +8,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import api from '../api/axios'
 import { motion, useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight, Play } from 'lucide-react'
 
@@ -58,14 +59,6 @@ const PIANO_IMGS = {
   ],
 }
 
-// ─── Featured Results data ────────────────────────────────────────────────────
-const RESULTS = [
-  { lot: 40,  brand: 'Steinway', model: '(c1995)', description: 'A 9ft concert grand piano in an ebonised case...', sold: '£36,000', img: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400&q=80' },
-  { lot: 54,  brand: 'Seiler',   model: '(c2002)', description: 'An upright piano in a traditional light yew wood...', sold: '£2,300', img: 'https://images.unsplash.com/photo-1552422535-c45813c61732?w=400&q=80' },
-  { lot: 70,  brand: 'Bechstein',model: '(c2018)', description: 'A 6ft (model 202) grand piano in a bright ebonised...', sold: '£50,000', img: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=400&q=80' },
-  { lot: 76,  brand: 'Grôtrian-Steinweg', model: '(c1965)', description: 'A Model 116 upright piano in a traditional bright ebony...', sold: '£5,000', img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80' },
-  { lot: 100, brand: 'Steinway', model: '(c2022)', description: 'A 6ft 11in Model B grand piano in a highly figured...', sold: '£53,000', img: 'https://images.unsplash.com/photo-1543443258-92b04ad5ec6b?w=400&q=80' },
-]
 
 // ─── Brands ───────────────────────────────────────────────────────────────────
 const BRANDS = [
@@ -239,13 +232,13 @@ const SERVICES = [
   {
     title: 'Sell My Piano',
     body: 'Find out how to sell your upright piano or grand piano quickly on-line from our specialist auctions.',
-    href: '/absentee-bid',
+    href: '/sell-my-piano',
     cta: 'Sell With Us →',
   },
   {
     title: 'Value My Piano',
     body: 'Get in touch with our experts to find out how much your piano is worth at one of our specialist auctions.',
-    href: '#',
+    href: '/value-my-piano',
     cta: 'Get Valuation →',
   },
 ]
@@ -311,13 +304,13 @@ function Valuation() {
               <a href="#" className="underline hover:text-gray-900">expert piano advisors</a>{' '}
               will help you to determine the price of your grand or upright piano at auction. With over 98% private vendor sale success rate, we guarantee results at all our piano auctions.
             </p>
-            <a
-              href="#"
+            <Link
+              to="/value-my-piano"
               className="inline-flex items-center gap-2 border border-gray-900 px-7 py-3.5 text-sm font-semibold text-gray-900 transition-all duration-300 hover:bg-gray-900 hover:text-white"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Get Your Quick Valuation
-            </a>
+            </Link>
           </FadeSection>
 
           {/* Image */}
@@ -342,12 +335,60 @@ function Valuation() {
 // FEATURED RESULTS
 // ═══════════════════════════════════════════════════════════════════════════════
 function FeaturedResults() {
-  const [idx, setIdx] = useState(0)
-  const visible = 4 // cards visible at once on desktop
-  const max = RESULTS.length - visible
+  const [idx, setIdx]   = useState(0)
+  const [lots, setLots] = useState([])
+  const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    api.get('auctions/past')
+      .then((res) => {
+        const all = (res.data || []).flatMap((auction) =>
+          (auction.lots || [])
+            .filter((l) => l.featured_image)
+            .map((l) => ({
+              key:   `${auction.id}-${l.id}`,
+              lot:   l.lot_number,
+              brand: l.brand || '',
+              model: l.title || '',
+              sold:  l.winning_bid_amount
+                       ? `£${Number(l.winning_bid_amount).toLocaleString('en-GB')}`
+                       : null,
+              img:   l.featured_image,
+            }))
+        )
+        setLots(all)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
+
+  const visible = 4
+  const max = Math.max(0, lots.length - visible)
   const prev = () => setIdx((i) => Math.max(0, i - 1))
   const next = () => setIdx((i) => Math.min(max, i + 1))
+
+  if (loading) {
+    return (
+      <Section id="results" className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-12">
+          <div className="mb-12 h-10 w-64 animate-pulse rounded bg-gray-200" />
+          <div className="grid grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-[3/2] w-full bg-gray-200" />
+                <div className="mt-4 space-y-2">
+                  <div className="h-3 w-3/4 rounded bg-gray-200" />
+                  <div className="h-3 w-full rounded bg-gray-200" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+    )
+  }
+
+  if (lots.length === 0) return null
 
   return (
     <Section id="results" className="bg-white py-20">
@@ -359,24 +400,26 @@ function FeaturedResults() {
           >
             Featured Past Results
           </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={prev}
-              disabled={idx === 0}
-              className="flex h-10 w-10 items-center justify-center border border-gray-300 text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-30"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              onClick={next}
-              disabled={idx >= max}
-              className="flex h-10 w-10 items-center justify-center border border-gray-300 text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-30"
-              aria-label="Next"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </div>
+          {lots.length > visible && (
+            <div className="flex gap-2">
+              <button
+                onClick={prev}
+                disabled={idx === 0}
+                className="flex h-10 w-10 items-center justify-center border border-gray-300 text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-30"
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={next}
+                disabled={idx >= max}
+                className="flex h-10 w-10 items-center justify-center border border-gray-300 text-gray-700 transition hover:border-gray-900 hover:bg-gray-900 hover:text-white disabled:opacity-30"
+                aria-label="Next"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </FadeSection>
 
         <div className="overflow-hidden">
@@ -385,8 +428,8 @@ function FeaturedResults() {
             animate={{ x: `calc(-${idx} * (25% + 1.5rem))` }}
             transition={{ type: 'tween', duration: 0.4 }}
           >
-            {RESULTS.map((r) => (
-              <div key={r.lot} className="w-[calc(25%-1.2rem)] shrink-0">
+            {lots.map((r) => (
+              <div key={r.key} className="w-[calc(25%-1.2rem)] shrink-0">
                 <div className="overflow-hidden">
                   <motion.img
                     src={r.img}
@@ -398,14 +441,16 @@ function FeaturedResults() {
                 </div>
                 <div className="pt-4">
                   <p className="text-xs font-semibold uppercase tracking-widest text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    Lot {r.lot} — {r.brand} {r.model}
+                    {r.lot ? `Lot ${r.lot} — ` : ''}{r.brand}
                   </p>
                   <p className="mt-1 text-sm leading-snug text-gray-700" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {r.description}
+                    {r.model}
                   </p>
-                  <p className="mt-2 text-sm font-semibold" style={{ color: '#8B4513', fontFamily: 'Inter, sans-serif' }}>
-                    Sold for: {r.sold}
-                  </p>
+                  {r.sold && (
+                    <p className="mt-2 text-sm font-semibold" style={{ color: '#8B4513', fontFamily: 'Inter, sans-serif' }}>
+                      Sold for: {r.sold}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -413,16 +458,18 @@ function FeaturedResults() {
         </div>
 
         {/* Dots */}
-        <div className="mt-8 flex justify-center gap-2">
-          {Array.from({ length: max + 1 }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className={`h-1.5 transition-all duration-300 ${i === idx ? 'w-6 bg-gray-900' : 'w-1.5 bg-gray-300'}`}
-              aria-label={`Slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        {lots.length > visible && (
+          <div className="mt-8 flex justify-center gap-2">
+            {Array.from({ length: max + 1 }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                className={`h-1.5 transition-all duration-300 ${i === idx ? 'w-6 bg-gray-900' : 'w-1.5 bg-gray-300'}`}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </Section>
   )
@@ -466,7 +513,7 @@ function Catalogue() {
             </p>
 
             <Link
-              to="/auctions"
+              to="/auction-catalogue"
               className="mb-12 inline-flex items-center gap-2 border border-white/30 px-7 py-3.5 text-sm font-medium text-white transition-all duration-300 hover:border-yellow-500 hover:text-yellow-500"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
@@ -601,13 +648,13 @@ function News() {
             <p className="mb-8 leading-relaxed text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
               Read our specialist news and insights into upright and grand pianos and get the insider information you need when joining our piano auctions to buy and sell your piano.
             </p>
-            <a
-              href="#"
+            <Link
+              to="/news-insight"
               className="inline-flex items-center gap-2 border border-white/30 px-7 py-3.5 text-sm font-medium text-white transition-all hover:border-yellow-500 hover:text-yellow-500"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               View All Our Latest News Posts
-            </a>
+            </Link>
           </FadeSection>
         </div>
 
