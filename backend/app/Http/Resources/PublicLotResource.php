@@ -25,6 +25,7 @@ class PublicLotResource extends JsonResource
             'serial_number'      => $this->serial_number,
             'year'               => $this->year,
             'condition'          => $this->condition,
+            'piano_type'         => $this->piano_type,
             'starting_bid'       => $this->starting_bid,
             'current_bid'        => $this->current_bid,
             'bid_increment'      => $this->bid_increment,

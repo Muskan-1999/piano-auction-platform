@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import { motion, useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ArrowRight, Play } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const gold  = '#C9A86A'
@@ -60,7 +61,7 @@ const PIANO_IMGS = {
 }
 
 
-// ─── Brands ───────────────────────────────────────────────────────────────────
+// ─── Brands (brand names don't change across languages) ─────────────────────
 const BRANDS = [
   { name: 'Feurich',    style: 'font-bold italic tracking-tight text-2xl' },
   { name: 'FAZIOLI',    style: 'font-bold tracking-widest text-xl' },
@@ -102,11 +103,11 @@ function Section({ id, className = '', children }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function Hero() {
   const videoRef = useRef(null)
+  const { t } = useLanguage()
   useEffect(() => {
     videoRef.current?.play().catch(() => {})
   }, [])
 
-  // Next auction date — set dynamically
   const nextAuction = '23 June 2026'
 
   return (
@@ -151,7 +152,7 @@ function Hero() {
           className="mb-4 text-xs font-medium uppercase tracking-[0.4em]"
           style={{ color: gold, fontFamily: 'Inter, sans-serif' }}
         >
-          Piano Auctions Ltd
+          {t('home.heroLabel')}
         </motion.p>
 
         <motion.h1
@@ -161,9 +162,9 @@ function Hero() {
           className="mb-6 max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl"
           style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
         >
-          World Leading<br />
-          Specialist Piano<br />
-          Auction
+          {t('home.heroHeadline').split('\n').map((line, i, arr) => (
+            <React.Fragment key={i}>{line}{i < arr.length - 1 && <br />}</React.Fragment>
+          ))}
         </motion.h1>
 
         <motion.p
@@ -173,7 +174,7 @@ function Hero() {
           className="mb-10 text-base font-light text-gray-300 md:text-lg"
           style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          Our Next Auction: {nextAuction}
+          {t('home.heroNext')} {nextAuction}
         </motion.p>
 
         <motion.div
@@ -187,12 +188,11 @@ function Hero() {
             className="group inline-flex items-center gap-2 rounded-full border border-white/60 px-8 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:border-yellow-500 hover:bg-yellow-500/10"
             style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '0.04em' }}
           >
-            Explore Auction
+            {t('home.heroExplore')}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </Link>
         </motion.div>
 
-        {/* Play button — bottom-left, matches reference site */}
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -203,7 +203,6 @@ function Hero() {
           <Play className="h-5 w-5 fill-current" />
         </motion.button>
 
-        {/* Scroll chevron */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -211,7 +210,7 @@ function Hero() {
           className="absolute bottom-8 right-8 flex flex-col items-center gap-1 text-white/40"
           style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          <span className="text-[9px] uppercase tracking-[0.3em]">Scroll</span>
+          <span className="text-[9px] uppercase tracking-[0.3em]">{t('home.heroScroll')}</span>
           <ChevronRight className="h-4 w-4 rotate-90 animate-bounce" />
         </motion.div>
       </div>
@@ -222,28 +221,11 @@ function Hero() {
 // ═══════════════════════════════════════════════════════════════════════════════
 // SERVICES
 // ═══════════════════════════════════════════════════════════════════════════════
-const SERVICES = [
-  {
-    title: 'Buy A Piano',
-    body: 'Browse our catalogue of grand and upright pianos to find the perfect instrument to buy from one of our piano auctions.',
-    href: '/buying-piano',
-    cta: 'Browse Pianos →',
-  },
-  {
-    title: 'Sell My Piano',
-    body: 'Find out how to sell your upright piano or grand piano quickly on-line from our specialist auctions.',
-    href: '/sell-my-piano',
-    cta: 'Sell With Us →',
-  },
-  {
-    title: 'Value My Piano',
-    body: 'Get in touch with our experts to find out how much your piano is worth at one of our specialist auctions.',
-    href: '/value-my-piano',
-    cta: 'Get Valuation →',
-  },
-]
+const SERVICE_HREFS = ['/buying-piano', '/sell-my-piano', '/value-my-piano']
 
 function Services() {
+  const { t } = useLanguage()
+  const SERVICES = t('home.services').map((s, i) => ({ ...s, href: SERVICE_HREFS[i] }))
   return (
     <Section id="services" style={{ background: dark }}>
       <div className="grid grid-cols-1 divide-y divide-white/10 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
@@ -282,6 +264,7 @@ function Services() {
 // VALUATION
 // ═══════════════════════════════════════════════════════════════════════════════
 function Valuation() {
+  const { t } = useLanguage()
   return (
     <Section id="valuation" className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-12">
@@ -293,23 +276,22 @@ function Valuation() {
               className="mb-6 text-4xl font-bold leading-tight text-gray-900 lg:text-5xl"
               style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
             >
-              Upright and Grand<br />Piano Valuation
+              {t('home.valuationHeading').split('\n').map((l, i, a) => (
+                <React.Fragment key={i}>{l}{i < a.length - 1 && <br />}</React.Fragment>
+              ))}
             </h2>
             <p className="mb-4 leading-relaxed text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Piano Auctions Ltd prides itself on helping clients value their pianos quickly so they can{' '}
-              <a href="#" className="underline hover:text-gray-900">sell their pianos at auction</a>.
+              {t('home.valuationP1')}
             </p>
             <p className="mb-8 leading-relaxed text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Our{' '}
-              <a href="#" className="underline hover:text-gray-900">expert piano advisors</a>{' '}
-              will help you to determine the price of your grand or upright piano at auction. With over 98% private vendor sale success rate, we guarantee results at all our piano auctions.
+              {t('home.valuationP2')}
             </p>
             <Link
               to="/value-my-piano"
               className="inline-flex items-center gap-2 border border-gray-900 px-7 py-3.5 text-sm font-semibold text-gray-900 transition-all duration-300 hover:bg-gray-900 hover:text-white"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              Get Your Quick Valuation
+              {t('home.valuationBtn')}
             </Link>
           </FadeSection>
 
@@ -335,6 +317,7 @@ function Valuation() {
 // FEATURED RESULTS
 // ═══════════════════════════════════════════════════════════════════════════════
 function FeaturedResults() {
+  const { t } = useLanguage()
   const [idx, setIdx]   = useState(0)
   const [lots, setLots] = useState([])
   const [loading, setLoading] = useState(true)
@@ -398,7 +381,7 @@ function FeaturedResults() {
             className="text-3xl font-bold text-gray-900 lg:text-4xl"
             style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
           >
-            Featured Past Results
+            {t('home.featuredResults')}
           </h2>
           {lots.length > visible && (
             <div className="flex gap-2">
@@ -448,7 +431,7 @@ function FeaturedResults() {
                   </p>
                   {r.sold && (
                     <p className="mt-2 text-sm font-semibold" style={{ color: '#8B4513', fontFamily: 'Inter, sans-serif' }}>
-                      Sold for: {r.sold}
+                      {t('home.soldFor')} {r.sold}
                     </p>
                   )}
                 </div>
@@ -479,6 +462,7 @@ function FeaturedResults() {
 // CATALOGUE
 // ═══════════════════════════════════════════════════════════════════════════════
 function Catalogue() {
+  const { t } = useLanguage()
   const { d, h, m, s } = useCountdown('2026-06-23T10:00:00')
 
   const pad = (n) => String(n).padStart(2, '0')
@@ -506,10 +490,12 @@ function Catalogue() {
               className="mb-6 text-4xl font-bold leading-tight text-white lg:text-5xl"
               style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
             >
-              Upright and Grand<br />Piano Catalogue
+              {t('home.catalogueHeading').split('\n').map((l, i, a) => (
+                <React.Fragment key={i}>{l}{i < a.length - 1 && <br />}</React.Fragment>
+              ))}
             </h2>
             <p className="mb-8 leading-relaxed text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Browse our catalogue for upright and grand pianos and get the insider information you need when joining our piano auctions to buy and sell your piano.
+              {t('home.catalogueBody')}
             </p>
 
             <Link
@@ -517,20 +503,20 @@ function Catalogue() {
               className="mb-12 inline-flex items-center gap-2 border border-white/30 px-7 py-3.5 text-sm font-medium text-white transition-all duration-300 hover:border-yellow-500 hover:text-yellow-500"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              View Our Piano Auction Catalogue
+              {t('home.catalogueBtn')}
             </Link>
 
             {/* Countdown */}
             <div>
               <p className="mb-5 text-xs uppercase tracking-[0.2em] text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Our Next Auction: Live In
+                {t('home.nextAuctionLive')}
               </p>
               <div className="flex gap-6">
                 {[
-                  { val: pad(d), label: 'Days' },
-                  { val: pad(h), label: 'Hours' },
-                  { val: pad(m), label: 'Mins' },
-                  { val: pad(s), label: 'Seconds' },
+                  { val: pad(d), label: t('home.countdownDays') },
+                  { val: pad(h), label: t('home.countdownHours') },
+                  { val: pad(m), label: t('home.countdownMins') },
+                  { val: pad(s), label: t('home.countdownSecs') },
                 ].map(({ val, label }) => (
                   <div key={label} className="text-center">
                     <div
@@ -557,6 +543,7 @@ function Catalogue() {
 // SUBSCRIBE
 // ═══════════════════════════════════════════════════════════════════════════════
 function Subscribe() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [sent,  setSent]  = useState(false)
 
@@ -568,50 +555,34 @@ function Subscribe() {
   return (
     <Section id="subscribe" style={{ background: black }}>
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        {/* Left: image */}
         <div className="relative h-[400px] overflow-hidden lg:h-auto">
-          <img
-            src={PIANO_IMGS.catalogue2}
-            alt="Piano auction"
-            className="h-full w-full object-cover"
-          />
+          <img src={PIANO_IMGS.catalogue2} alt="Piano auction" className="h-full w-full object-cover" />
           <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.4)' }} />
         </div>
 
-        {/* Right: form */}
         <div className="flex flex-col justify-center px-10 py-20 lg:px-16">
           <FadeSection>
             <p className="mb-3 text-xs font-medium uppercase tracking-[0.25em] text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Keep Up To Date
+              {t('home.subscribeLabel')}
             </p>
-            <h2
-              className="mb-8 text-4xl font-bold leading-tight text-white"
-              style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
-            >
-              Subscribe to our<br />Auction Updates
+            <h2 className="mb-8 text-4xl font-bold leading-tight text-white" style={{ fontFamily: 'Playfair Display, Georgia, serif' }}>
+              {t('home.subscribeHeading').split('\n').map((l, i, a) => (
+                <React.Fragment key={i}>{l}{i < a.length - 1 && <br />}</React.Fragment>
+              ))}
             </h2>
 
             {sent ? (
-              <p className="text-sm text-green-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Thank you — you're on the list!
-              </p>
+              <p className="text-sm text-green-400" style={{ fontFamily: 'Inter, sans-serif' }}>{t('home.subscribeSuccess')}</p>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-row">
-                <input
-                  type="email"
-                  required
-                  placeholder="Email Address"
-                  value={email}
+                <input type="email" required placeholder={t('home.subscribePlaceholder')} value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="flex-1 border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                />
-                <button
-                  type="submit"
+                  style={{ fontFamily: 'Inter, sans-serif' }} />
+                <button type="submit"
                   className="whitespace-nowrap bg-white px-7 py-3 text-sm font-semibold text-gray-900 transition hover:bg-yellow-500 hover:text-black"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
-                >
-                  Subscribe
+                  style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {t('home.subscribeBtn')}
                 </button>
               </form>
             )}
@@ -626,34 +597,28 @@ function Subscribe() {
 // NEWS
 // ═══════════════════════════════════════════════════════════════════════════════
 function News() {
+  const { t } = useLanguage()
   return (
     <Section id="news" style={{ background: dark }}>
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        {/* Left: content */}
         <div className="flex flex-col justify-center px-10 py-20 lg:px-16">
           <FadeSection>
-            <p
-              className="mb-3 text-xs font-medium uppercase tracking-[0.25em] text-gray-500"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              Further Information
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.25em] text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {t('home.newsLabel')}
             </p>
             <div className="w-1 h-12 mb-8" style={{ background: gold }} />
-            <h2
-              className="mb-6 text-4xl font-bold leading-tight text-white lg:text-5xl"
-              style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
-            >
-              Piano Auctions<br />News and Insights
+            <h2 className="mb-6 text-4xl font-bold leading-tight text-white lg:text-5xl" style={{ fontFamily: 'Playfair Display, Georgia, serif' }}>
+              {t('home.newsHeading').split('\n').map((l, i, a) => (
+                <React.Fragment key={i}>{l}{i < a.length - 1 && <br />}</React.Fragment>
+              ))}
             </h2>
             <p className="mb-8 leading-relaxed text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Read our specialist news and insights into upright and grand pianos and get the insider information you need when joining our piano auctions to buy and sell your piano.
+              {t('home.newsBody')}
             </p>
-            <Link
-              to="/news-insight"
+            <Link to="/news-insight"
               className="inline-flex items-center gap-2 border border-white/30 px-7 py-3.5 text-sm font-medium text-white transition-all hover:border-yellow-500 hover:text-yellow-500"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              View All Our Latest News Posts
+              style={{ fontFamily: 'Inter, sans-serif' }}>
+              {t('home.newsBtn')}
             </Link>
           </FadeSection>
         </div>
@@ -678,6 +643,7 @@ function News() {
 // BRANDS
 // ═══════════════════════════════════════════════════════════════════════════════
 function Brands() {
+  const { t } = useLanguage()
   const [idx, setIdx] = useState(0)
   const perPage = 5
   const maxIdx  = Math.max(0, BRANDS.length - perPage)
@@ -689,13 +655,10 @@ function Brands() {
       <div className="mx-auto max-w-7xl px-6 lg:px-12">
         <FadeSection className="mb-14 text-center">
           <p className="mb-2 text-xs font-medium uppercase tracking-[0.25em] text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-            Brands At Auction
+            {t('home.brandsLabel')}
           </p>
-          <h2
-            className="text-3xl font-bold text-gray-900 lg:text-4xl"
-            style={{ fontFamily: 'Playfair Display, Georgia, serif' }}
-          >
-            Pianos We Sell
+          <h2 className="text-3xl font-bold text-gray-900 lg:text-4xl" style={{ fontFamily: 'Playfair Display, Georgia, serif' }}>
+            {t('home.brandsHeading')}
           </h2>
         </FadeSection>
 

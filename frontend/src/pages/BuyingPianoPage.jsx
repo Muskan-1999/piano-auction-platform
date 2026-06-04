@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiPlus, FiMinus } from 'react-icons/fi'
 import api from '../api/axios'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const IMG = {
   hero:        'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80',
@@ -13,57 +14,8 @@ const IMG = {
   appointment: 'https://images.unsplash.com/photo-1444084316824-dc26d6657664?w=900&q=80',
 }
 
-const STEPS = [
-  {
-    num: 1,
-    title: 'View Pianos To Buy',
-    desc: 'Browse our selection of grand and upright pianos, book a viewing appointment at our auction venue, or submit our online valuation form and discuss your options with our piano specialists.',
-  },
-  {
-    num: 2,
-    title: 'Bid On Your Piano',
-    desc: 'Bid online, over the phone or by leaving an absentee bid. All you need to do is register with either ourselves or on our online platform before you can buy a piano.',
-  },
-  {
-    num: 3,
-    title: 'Buy Pianos',
-    desc: "If you win the bid on your piano, you'll find yourself the proud new owner of a grand or upright piano. Once you have bought, you'll receive an invoice which we ask to be paid by bank transfer.",
-  },
-  {
-    num: 4,
-    title: 'Piano Delivery',
-    desc: 'Once you have bought your piano at auction, you can organise a collection and delivery with us. We recommend an experienced piano haulier to transport your piano so that it can be collected promptly.',
-  },
-]
-
-const FAQS = [
-  {
-    q: 'What should I look for when buying a second hand piano?',
-    a: 'Look for consistent tone across all keys, smooth action, proper sustain pedal function, and check for any visible damage to the cabinet. Our experts can guide you through each piano in our showroom.',
-  },
-  {
-    q: 'Is it better to buy a piano at auction or from a retailer?',
-    a: 'Auction prices are often significantly lower than retail. At Piano Auctions Ltd, every piano is checked and prepared by our specialists, giving you quality assurance alongside competitive auction pricing.',
-  },
-  {
-    q: 'Do I need to be an experienced player to buy a piano?',
-    a: "Not at all. Whether you're a beginner or a concert pianist, our team will help you find the right instrument for your level and budget.",
-  },
-  {
-    q: 'How much should I expect to spend on a good piano?',
-    a: 'Quality upright pianos start from a few hundred pounds at auction, while grand pianos vary widely. Our team can advise based on your requirements and budget.',
-  },
-  {
-    q: 'Can I get help transporting and setting up my new piano?',
-    a: "Yes. Once you've purchased your piano at auction, we can help organise professional piano transport and placement in your home.",
-  },
-]
-
-const PIANO_CARDS = [
-  { title: 'Grand Pianos',     link: 'View Grand Pianos',   img: IMG.grand,   href: '/shop/grand-pianos' },
-  { title: 'Upright Pianos',   link: 'View Upright Pianos', img: IMG.upright, href: '/shop/upright-pianos' },
-  { title: 'All Piano Brands', link: 'View Piano Brands',   img: IMG.brands,  href: '/piano-brands' },
-]
+const PIANO_CARD_IMGS = [IMG.grand, IMG.upright, IMG.brands]
+const PIANO_CARD_HREFS = ['/shop/grand-pianos', '/shop/upright-pianos', '/piano-brands']
 
 // ── Brand carousel sub-components ──────────────────────────────────────────
 
@@ -129,8 +81,13 @@ function BrandsCarousel({ brands }) {
 
 export default function BuyingPianoPage() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [openFaq, setOpenFaq] = useState(null)
   const [brands, setBrands]   = useState([])
+
+  const STEPS = t('buyingPiano.steps').map((s, i) => ({ num: i + 1, ...s }))
+  const FAQS  = t('buyingPiano.faqs')
+  const PIANO_CARDS = t('buyingPiano.pianoCards').map((c, i) => ({ ...c, img: PIANO_CARD_IMGS[i], href: PIANO_CARD_HREFS[i] }))
 
   useEffect(() => {
     api.get('piano-brands')
@@ -152,26 +109,26 @@ export default function BuyingPianoPage() {
           {/* Left — headline */}
           <div className="flex-1 max-w-lg">
             <nav className="mb-4 text-xs text-white/60">
-              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="hover:text-white transition-colors">{t('buyingPiano.breadcrumbHome')}</Link>
               <span className="mx-2">&rsaquo;</span>
-              <span className="text-white/80">Buying A Piano</span>
+              <span className="text-white/80">{t('buyingPiano.breadcrumbPage')}</span>
             </nav>
-            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">BUY A PIANO</p>
+            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">{t('buyingPiano.pageLabel')}</p>
             <h1
               className="text-4xl lg:text-5xl font-heading text-white leading-tight mb-5"
               style={{ fontFamily: 'Georgia, serif', margin: 0, fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
-              Buy A Piano At Auction
+              {t('buyingPiano.heroTitle')}
             </h1>
             <p className="text-white/80 text-sm leading-relaxed max-w-md mb-5">
-              Buy your piano at auction with our trusted experts. We have a full range of piano brands to buy, view our latest piano auction catalogue.
+              {t('buyingPiano.heroDesc')}
             </p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">Upright Pianos</Link>
+              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">{t('buyingPiano.heroLinkUpright')}</Link>
               <span className="text-white/40">|</span>
-              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">Grand Pianos</Link>
+              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">{t('buyingPiano.heroLinkGrand')}</Link>
               <span className="text-white/40">|</span>
-              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">Piano Brands</Link>
+              <Link to="/auctions" className="text-white/80 underline underline-offset-4 hover:text-white transition-colors">{t('buyingPiano.heroLinkBrands')}</Link>
             </div>
           </div>
 
@@ -181,23 +138,23 @@ export default function BuyingPianoPage() {
               className="text-xl font-heading text-gray-900 mb-2"
               style={{ fontFamily: 'Georgia, serif', margin: '0 0 8px' }}
             >
-              Register To Bid
+              {t('buyingPiano.registerTitle')}
             </h2>
             <p className="text-xs text-gray-500 mb-6 leading-relaxed">
-              Bid for your favourite piano or watch the latest auction live with easyliveauction.com
+              {t('buyingPiano.registerDesc')}
             </p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => navigate('/contact')}
                 className="w-full bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-gray-900 transition-colors"
               >
-                UK – BID NOW
+                {t('buyingPiano.bidNowUK')}
               </button>
               <button
                 onClick={() => navigate('/bidding')}
                 className="w-full border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-gray-50 transition-colors"
               >
-                OTHER WAYS TO BID
+                {t('buyingPiano.otherWays')}
               </button>
             </div>
           </div>
@@ -219,19 +176,15 @@ export default function BuyingPianoPage() {
               className="font-heading text-gray-900 leading-snug mb-5"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', margin: '0 0 20px' }}
             >
-              Second Hand Pianos To Buy At Auction
+              {t('buyingPiano.secondHandTitle')}
             </h2>
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">
-              Looking for a great piano without the high price tag? Our second hand pianos are the perfect place to find quality pianos at unbeatable value. From uprights to grands, you'll discover trusted brands and beautiful pianos ready for a new home.
-            </p>
-            <p className="text-gray-600 text-sm leading-relaxed mb-8">
-              Each piano is checked for sound and condition, so you can bid with confidence. Explore our latest auctions and find the piano that's right for you.
-            </p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4">{t('buyingPiano.secondHandP1')}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-8">{t('buyingPiano.secondHandP2')}</p>
             <button
               onClick={() => navigate('/auction-catalogue')}
               className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors"
             >
-              VIEW THE LATEST AUCTION CATALOGUE
+              {t('buyingPiano.viewCatalogueBtn')}
             </button>
           </div>
         </div>
@@ -245,11 +198,9 @@ export default function BuyingPianoPage() {
               className="font-heading text-gray-900 mb-3"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', margin: '0 0 12px' }}
             >
-              Available Pianos To Buy
+              {t('buyingPiano.availableTitle')}
             </h2>
-            <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-              Browse our range of available pianos ready to buy at auction. Whether you prefer the elegance of a grand piano, the space-saving style of an upright, or the convenience of a digital model, we've got options to suit every player and budget.
-            </p>
+            <p className="text-sm text-gray-600 max-w-2xl mx-auto">{t('buyingPiano.availableDesc')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {PIANO_CARDS.map((card) => (
@@ -271,9 +222,7 @@ export default function BuyingPianoPage() {
                   >
                     {card.title}
                   </h3>
-                  <p className="text-sm text-white/80">
-                    To get an accurate estimate of your piano's value, simply submit our online valuation form.
-                  </p>
+                  <p className="text-sm text-white/80">{t('buyingPiano.pianoCardDesc')}</p>
                   <span className="inline-block mt-2 text-white text-sm underline underline-offset-4 hover:text-white/80">
                     {card.link}
                   </span>
@@ -292,14 +241,9 @@ export default function BuyingPianoPage() {
               className="font-heading text-gray-900"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', margin: '0 0 12px' }}
             >
-              Buying A Piano At Auction – Made Easy
+              {t('buyingPiano.buyingMadeEasyTitle')}
             </h2>
-            <p className="text-sm text-gray-500 max-w-xl mx-auto">
-              Buying a piano at auction is simple, just follow our four quick steps to find, bid and bring home the piano you love.
-              And if you're also thinking about{' '}
-              <Link to="/contact" className="underline text-gray-700 hover:text-black">selling a piano</Link>
-              , we can help with that too. Start below and view what pianos we have available.
-            </p>
+            <p className="text-sm text-gray-500 max-w-xl mx-auto">{t('buyingPiano.buyingMadeEasyDesc')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {STEPS.map((step) => (
@@ -317,7 +261,7 @@ export default function BuyingPianoPage() {
               onClick={() => navigate('/auction-catalogue')}
               className="bg-black text-white text-xs font-semibold tracking-wider uppercase py-4 px-10 hover:bg-gray-900 transition-colors"
             >
-              VIEW AVAILABLE PIANOS TO BUY
+              {t('buyingPiano.viewAvailableBtn')}
             </button>
           </div>
         </div>
@@ -330,21 +274,19 @@ export default function BuyingPianoPage() {
       >
         <div className="absolute inset-0 bg-black/65" />
         <div className="relative z-10 max-w-7xl mx-auto">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-4">OUR LATEST PIANO CATALOGUE</p>
+          <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-4">{t('buyingPiano.catalogueLabel')}</p>
           <h2
             className="font-heading text-white mb-4 max-w-lg"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', margin: '0 0 16px' }}
           >
-            Piano Auction Catalogue
+            {t('buyingPiano.catalogueTitle')}
           </h2>
-          <p className="text-white/75 text-sm leading-relaxed max-w-md mb-8">
-            Explore our latest auction catalogue to see all pianos currently available to bid on. Browse full details, photos and auction dates in one place, and find the perfect piano that's right for you.
-          </p>
+          <p className="text-white/75 text-sm leading-relaxed max-w-md mb-8">{t('buyingPiano.catalogueDesc')}</p>
           <button
             onClick={() => navigate('/auction-catalogue')}
             className="border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors"
           >
-            VIEW AVAILABLE PIANOS TO BUY
+            {t('buyingPiano.catalogueBtn')}
           </button>
         </div>
       </section>
@@ -364,16 +306,14 @@ export default function BuyingPianoPage() {
               className="font-heading text-white mb-5"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 2.5vw, 2.2rem)', margin: '0 0 20px' }}
             >
-              Book Your Showroom Appointment
+              {t('buyingPiano.showroomTitle')}
             </h2>
-            <p className="text-white/70 text-sm leading-relaxed mb-8 max-w-md">
-              Book a showroom appointment to see the pianos in person before you buy. Get expert guidance, compare models, and find the perfect piano with confidence.
-            </p>
+            <p className="text-white/70 text-sm leading-relaxed mb-8 max-w-md">{t('buyingPiano.showroomDesc')}</p>
             <button
               onClick={() => navigate('/viewing-appointments')}
               className="border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors"
             >
-              BOOK YOUR APPOINTMENT
+              {t('buyingPiano.bookAppointmentBtn')}
             </button>
           </div>
         </div>
@@ -386,7 +326,7 @@ export default function BuyingPianoPage() {
             className="font-heading text-gray-900 text-center mb-10"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', margin: '0 0 40px' }}
           >
-            Buy Piano FAQs
+            {t('buyingPiano.faqTitle')}
           </h2>
           <div className="divide-y divide-gray-200">
             {FAQS.map((faq, i) => (
@@ -418,18 +358,16 @@ export default function BuyingPianoPage() {
             className="font-heading text-gray-900 mb-3"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', margin: '0 0 12px' }}
           >
-            Piano Brands You Can Buy
+            {t('buyingPiano.brandsTitle')}
           </h2>
-          <p className="text-sm text-gray-600 max-w-xl mx-auto">
-            We deal with a wide range of piano brands, offering competitive prices for both well-known and specialist brands.
-          </p>
+          <p className="text-sm text-gray-600 max-w-xl mx-auto">{t('buyingPiano.brandsDesc')}</p>
         </div>
 
         {brands.length > 0 ? (
           <BrandsCarousel brands={brands} />
         ) : (
           <div className="flex justify-center">
-            <p className="text-sm text-gray-400 italic">Loading brands…</p>
+            <p className="text-sm text-gray-400 italic">{t('buyingPiano.loadingBrands')}</p>
           </div>
         )}
       </section>

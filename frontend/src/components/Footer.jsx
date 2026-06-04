@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { FaFacebook, FaInstagram, FaLinkedin } from 'react-icons/fa'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const FOOTER_IMAGES = [
   'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400&q=80',
@@ -13,43 +14,44 @@ const FOOTER_IMAGES = [
   'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&q=80',
 ]
 
-const FOOTER_LINKS = [
-  {
-    title: 'Auctions',
-    links: [
-      { label: 'Buying a Piano', href: '/auctions' },
-      { label: 'Selling a Piano', href: '/absentee-bid' },
-      { label: 'Piano Catalogues', href: '/lots' },
-      { label: 'Beginners Auctions Guide', href: '#' },
-      { label: 'Bidding', href: '#' },
-    ],
-  },
-  {
-    title: 'About',
-    links: [
-      { label: 'About Us', href: '/about' },
-      { label: 'News & Insights', href: '/news-insight' },
-      { label: 'Deliveries', href: '#' },
-      { label: 'Appointments', href: '/viewing-appointments' },
-      { label: 'FAQs', href: '/faq' },
-    ],
-  },
-  {
-    title: 'Featured Brands',
-    links: [
-      { label: 'Yamaha', href: '#' },
-      { label: 'Steingraeber', href: '#' },
-      { label: 'Schimmel', href: '#' },
-      { label: 'Kawai', href: '#' },
-      { label: 'Petrof', href: '#' },
-      { label: 'Steinway and Sons', href: '#' },
-      { label: 'Sauter', href: '#' },
-    ],
-  },
-]
-
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const { t } = useLanguage()
+
+  const footerLinks = [
+    {
+      title: t('footer.auctions'),
+      links: [
+        { label: t('footer.buyingAPiano'),   href: '/auctions' },
+        { label: t('footer.sellingAPiano'),  href: '/absentee-bid' },
+        { label: t('footer.pianoCatalogues'),href: '/lots' },
+        { label: t('footer.beginnersGuide'), href: '#' },
+        { label: t('footer.bidding'),        href: '#' },
+      ],
+    },
+    {
+      title: t('footer.about'),
+      links: [
+        { label: t('footer.aboutUs'),       href: '/about' },
+        { label: t('footer.newsInsights'),  href: '/news-insight' },
+        { label: t('footer.deliveries'),    href: '#' },
+        { label: t('footer.appointments'),  href: '/viewing-appointments' },
+        { label: t('footer.faqs'),          href: '/faq' },
+      ],
+    },
+    {
+      title: t('footer.featuredBrands'),
+      links: [
+        { label: 'Yamaha',           href: '#' },
+        { label: 'Steingraeber',     href: '#' },
+        { label: 'Schimmel',         href: '#' },
+        { label: 'Kawai',            href: '#' },
+        { label: 'Petrof',           href: '#' },
+        { label: 'Steinway and Sons',href: '#' },
+        { label: 'Sauter',           href: '#' },
+      ],
+    },
+  ]
 
   return (
     <footer className="w-full max-w-none px-0 mx-0 bg-gray-950 text-gray-300">
@@ -73,7 +75,7 @@ export default function Footer() {
             <div className="space-y-5">
               <div className="text-2xl font-semibold text-white">Piano Auctions Ltd</div>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Specialist piano & keyboard auctioneers presenting premium lots and expert service for buyers and sellers.
+                {t('footer.description')}
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <a href="#" className="text-gray-400 hover:text-white transition-colors" aria-label="Facebook">
@@ -88,7 +90,7 @@ export default function Footer() {
               </div>
             </div>
 
-            {FOOTER_LINKS.map((section) => (
+            {footerLinks.map((section) => (
               <div key={section.title}>
                 <h3 className="text-white text-base font-semibold mb-4">{section.title}</h3>
                 <ul className="space-y-3 text-sm">
@@ -115,16 +117,10 @@ export default function Footer() {
               <p className="text-gray-500 text-sm">
                 © {currentYear} Piano Auctions Ltd. All rights reserved.
               </p>
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-end">
-                <div className="flex flex-wrap items-center gap-4 text-gray-400">
-                  <a href="#" className="text-sm hover:text-white transition-colors">Terms & Conditions</a>
-                  <a href="#" className="text-sm hover:text-white transition-colors">Cookie Policy</a>
-                  <a href="#" className="text-sm hover:text-white transition-colors">Privacy Policy</a>
-                </div>
-                <button className="inline-flex items-center gap-2 rounded-full border border-gray-800 bg-gray-900 px-4 py-2 text-sm text-gray-100 hover:bg-white/5 transition-colors">
-                  <span>🇬🇧</span>
-                  <span className="font-semibold">EN</span>
-                </button>
+              <div className="flex flex-wrap items-center gap-4 text-gray-400">
+                <a href="#" className="text-sm hover:text-white transition-colors">{t('footer.terms')}</a>
+                <a href="#" className="text-sm hover:text-white transition-colors">{t('footer.cookie')}</a>
+                <a href="#" className="text-sm hover:text-white transition-colors">{t('footer.privacy')}</a>
               </div>
             </div>
           </div>

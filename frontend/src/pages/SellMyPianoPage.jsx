@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FiPlus, FiMinus } from 'react-icons/fi'
 import api from '../api/axios'
 import ValuationModal from '../components/sell-piano/ValuationModal'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const IMG = {
   hero:       'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80',
@@ -13,82 +14,6 @@ const IMG = {
   selling:    'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=900&q=80',
 }
 
-const HOW_STEPS = [
-  {
-    title: 'Piano Valuation',
-    body: 'To get an accurate estimate of your piano\'s value, simply submit our valuation form. Our expert specialists will assess your piano, giving you a clear understanding of the potential price you can expect when selling your piano at auction.',
-  },
-  {
-    title: 'Contract Agreement',
-    body: 'Once you\'ve agreed to sell your piano at auction, we\'ll send you a digital contract and transport form to finalise the process. Once you\'re happy with the contract, you can make the decision to sell at the price we agree, or to change the collection and delivery.',
-  },
-  {
-    title: 'Piano Collection',
-    body: 'Once you\'ve completed the Auction Contract process, we\'ll arrange for your piano to be collected by one of our trusted transport services, ensuring safe handling and delivery.',
-  },
-  {
-    title: 'Selling Your Piano',
-    body: 'After selling your piano at auction, we will provide a post-sale advice letter with the auction results. You will also receive a settlement cheque once any applicable charges and the final settlement amount from the sale of your piano has been deducted.',
-  },
-]
-
-const FAQS = [
-  {
-    q: 'How much is my piano worth if I want to sell it?',
-    a: 'The value of your piano depends on its make, model, age, and condition. Submit our valuation form and our specialists will provide a free, accurate estimate based on current market data.',
-  },
-  {
-    q: 'How can I sell my piano if I live far away from the auction house?',
-    a: 'No problem. We work with trusted transport partners across the UK to arrange collection from your home. Simply submit your valuation form and we\'ll handle the logistics.',
-  },
-  {
-    q: 'How long does it take to get a valuation for my piano?',
-    a: 'Once you submit your valuation form with photos, our team typically responds within 2–3 business days with an estimated auction value.',
-  },
-  {
-    q: 'Do you buy all piano brands?',
-    a: 'We deal with a wide range of brands from Yamaha and Kawai to Steinway & Sons, Bechstein, Blüthner, and Petrof. Submit your details and we\'ll let you know if your piano is suitable for auction.',
-  },
-  {
-    q: "What happens if my piano doesn't sell at auction?",
-    a: "If your piano doesn't reach its reserve price, we'll discuss the options with you. We may re-list it in a future auction or explore alternative selling routes.",
-  },
-]
-
-const PROCESS_SECTIONS = [
-  {
-    title: 'Valuation Of Your Piano',
-    img: IMG.valuation,
-    body: [
-      'If you are interested in selling your piano at one of our auctions, you can simply get in touch with us, and we\'ll be happy to discuss the details of your piano and provide you with a free auction estimate as quickly as possible.',
-      'The estimate you receive will be estimated based on what our specialists would expect it to sell for. We\'ll base this price on current market trends, past results for pianos similar to yours, and the provenance of your piano.',
-    ],
-  },
-  {
-    title: 'Piano Auction Contract',
-    img: IMG.contract,
-    body: [
-      'Once you have received the valuation for your piano and are satisfied with the estimated price when selling your piano at auction, we will send you the Auction Contract.',
-      'Filling out your Auction Contract is a quick and easy process. The information you need to provide includes: Name & address, Contact details, and Details of piano.',
-    ],
-  },
-  {
-    title: 'Collection Of Your Piano',
-    img: IMG.collection,
-    body: [
-      "After completing the Auction Contract process, we'll arrange for your piano to be collected by one of our trusted transport services, ensuring safe handling throughout.",
-      "We will organise for one of our specialist carriers, Griffin Transport UK or Barter Smith, to collect your piano for sale at auction. Alternatively, you can arrange your own transport.",
-    ],
-  },
-  {
-    title: 'Selling Your Piano',
-    img: IMG.selling,
-    body: [
-      'During the auction process, you can follow your piano live on the auction website.',
-      "After your piano has been sold, you can find the results in a number of ways. We will post the results on our results page within a couple hours of the auction's conclusion.",
-    ],
-  },
-]
 
 // ── Brand carousel ──────────────────────────────────────────────────────────
 
@@ -137,6 +62,7 @@ function BrandsCarousel({ brands }) {
 const inputCls = 'w-full border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-gray-700 transition-colors'
 
 function HeroCard({ onSubmit }) {
+  const { t } = useLanguage()
   const [form, setForm]   = useState({ first_name: '', last_name: '', email: '', phone: '' })
   const [errors, setErrors] = useState({})
 
@@ -144,11 +70,11 @@ function HeroCard({ onSubmit }) {
 
   const validate = () => {
     const e = {}
-    if (!form.first_name.trim()) e.first_name = 'Required'
-    if (!form.last_name.trim())  e.last_name  = 'Required'
-    if (!form.email.trim())      e.email      = 'Required'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email'
-    if (!form.phone.trim())      e.phone      = 'Required'
+    if (!form.first_name.trim()) e.first_name = t('sellMyPiano.required')
+    if (!form.last_name.trim())  e.last_name  = t('sellMyPiano.required')
+    if (!form.email.trim())      e.email      = t('sellMyPiano.required')
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t('sellMyPiano.invalidEmail')
+    if (!form.phone.trim())      e.phone      = t('sellMyPiano.required')
     return e
   }
 
@@ -163,37 +89,37 @@ function HeroCard({ onSubmit }) {
   return (
     <form onSubmit={submit} className="w-full max-w-sm bg-white shadow-2xl p-7 flex-shrink-0">
       <h2 className="text-lg text-gray-900 mb-5" style={{ fontFamily: 'Georgia, serif', fontWeight: 400 }}>
-        Use Our Piano Valuation Form
+        {t('sellMyPiano.valuationFormTitle')}
       </h2>
 
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
           <input type="text" name="first_name" value={form.first_name} onChange={handle}
-            placeholder="First Name *" className={inputCls} />
+            placeholder={`${t('sellMyPiano.firstName')} *`} className={inputCls} />
           {errors.first_name && <p className="text-xs text-red-500 mt-0.5">{errors.first_name}</p>}
         </div>
         <div>
           <input type="text" name="last_name" value={form.last_name} onChange={handle}
-            placeholder="Last Name *" className={inputCls} />
+            placeholder={`${t('sellMyPiano.lastName')} *`} className={inputCls} />
           {errors.last_name && <p className="text-xs text-red-500 mt-0.5">{errors.last_name}</p>}
         </div>
       </div>
 
       <div className="mb-3">
         <input type="email" name="email" value={form.email} onChange={handle}
-          placeholder="Email *" className={inputCls} />
+          placeholder={`${t('sellMyPiano.email')} *`} className={inputCls} />
         {errors.email && <p className="text-xs text-red-500 mt-0.5">{errors.email}</p>}
       </div>
 
       <div className="mb-5">
         <input type="tel" name="phone" value={form.phone} onChange={handle}
-          placeholder="Phone *" className={inputCls} />
+          placeholder={`${t('sellMyPiano.phone')} *`} className={inputCls} />
         {errors.phone && <p className="text-xs text-red-500 mt-0.5">{errors.phone}</p>}
       </div>
 
       <button type="submit"
         className="w-full bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 hover:bg-gray-800 transition-colors">
-        Next
+        {t('sellMyPiano.nextBtn')}
       </button>
     </form>
   )
@@ -202,11 +128,17 @@ function HeroCard({ onSubmit }) {
 // ── Main page ────────────────────────────────────────────────────────────────
 
 export default function SellMyPianoPage() {
+  const { t } = useLanguage()
   const [modalOpen, setModalOpen]       = useState(false)
   const [personalData, setPersonalData] = useState({})
   const [openFaq, setOpenFaq]           = useState(null)
   const [brands, setBrands]             = useState([])
   const [heroKey, setHeroKey]           = useState(0)
+
+  const HOW_STEPS = t('sellMyPiano.howSteps')
+  const FAQS      = t('sellMyPiano.faqs')
+  const PROCESS_IMGS_MAP = [IMG.valuation, IMG.contract, IMG.collection, IMG.selling]
+  const PROCESS_SECTIONS = t('sellMyPiano.processSections').map((s, i) => ({ ...s, img: PROCESS_IMGS_MAP[i] }))
 
   useEffect(() => {
     api.get('piano-brands').then((r) => setBrands(r.data)).catch(() => setBrands([]))
@@ -230,18 +162,16 @@ export default function SellMyPianoPage() {
 
           <div className="flex-1 max-w-lg">
             <nav className="mb-4 text-xs text-white/60">
-              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="hover:text-white transition-colors">{t('sellMyPiano.breadcrumbHome')}</Link>
               <span className="mx-2">&rsaquo;</span>
-              <span className="text-white/80">Sell My Piano</span>
+              <span className="text-white/80">{t('sellMyPiano.breadcrumbPage')}</span>
             </nav>
-            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">PROFESSIONAL MUSIC AUCTIONEERS</p>
+            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">{t('sellMyPiano.pageLabel')}</p>
             <h1 className="text-white leading-tight mb-5" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 400 }}>
-              Sell My Piano<br />
-              <span className="font-semibold">With Trusted Experts</span>
+              {t('sellMyPiano.heroTitle')}<br />
+              <span className="font-semibold">{t('sellMyPiano.heroTitleBold')}</span>
             </h1>
-            <p className="text-white/80 text-sm leading-relaxed max-w-md">
-              We offer a professional, hassle-free service to help you sell your piano, ensuring you receive the best price through expert piano valuation.
-            </p>
+            <p className="text-white/80 text-sm leading-relaxed max-w-md">{t('sellMyPiano.heroDesc')}</p>
           </div>
 
           <HeroCard key={heroKey} onSubmit={openModal} />
@@ -257,19 +187,15 @@ export default function SellMyPianoPage() {
           <div>
             <h2 className="text-gray-900 leading-snug mb-5"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400, margin: '0 0 20px' }}>
-              A Trusted and Efficient Way to Sell Your Piano
+              {t('sellMyPiano.trustedTitle')}
             </h2>
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">
-              Selling a piano can be challenging, but our expert team makes the process simple. Whether you have an upright, grand, or digital piano, we offer fair valuations, fast collections, and professional handling.
-            </p>
-            <p className="text-gray-600 text-sm leading-relaxed mb-8">
-              From assessment to collection, we ensure that your piano is treated with the utmost care, providing you with a seamless and straightforward experience.
-            </p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4">{t('sellMyPiano.trustedP1')}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-8">{t('sellMyPiano.trustedP2')}</p>
             <button
               onClick={() => setModalOpen(true)}
               className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors"
             >
-              GET MY PIANO VALUATION
+              {t('sellMyPiano.getValuationBtn')}
             </button>
           </div>
         </div>
@@ -281,11 +207,9 @@ export default function SellMyPianoPage() {
           <div className="text-center mb-12">
             <h2 className="text-gray-900 mb-3"
               style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 400, margin: '0 0 12px' }}>
-              How to Sell Your Piano
+              {t('sellMyPiano.howToSellTitle')}
             </h2>
-            <p className="text-sm text-gray-600 max-w-2xl mx-auto">
-              Selling your piano is a straightforward process with our structured approach. Our team conducts a comprehensive evaluation, taking into account the make, model, condition, and market demand.
-            </p>
+            <p className="text-sm text-gray-600 max-w-2xl mx-auto">{t('sellMyPiano.howToSellDesc')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {HOW_STEPS.map((s) => (
@@ -293,7 +217,7 @@ export default function SellMyPianoPage() {
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">{s.title}</h3>
                 <p className="text-xs text-gray-500 leading-relaxed mb-4">{s.body}</p>
                 <button className="text-xs font-semibold text-gray-900 underline underline-offset-4 hover:text-gray-600 transition-colors">
-                  Read More
+                  {t('sellMyPiano.readMore')}
                 </button>
               </div>
             ))}
@@ -306,7 +230,7 @@ export default function SellMyPianoPage() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-gray-900 text-center mb-10"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 400, margin: '0 0 40px' }}>
-            Sell My Piano FAQs
+            {t('sellMyPiano.faqTitle')}
           </h2>
           <div className="divide-y divide-gray-200">
             {FAQS.map((faq, i) => (
@@ -334,15 +258,13 @@ export default function SellMyPianoPage() {
         <div className="text-center mb-10 px-6 lg:px-10">
           <h2 className="text-gray-900 mb-3"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 400, margin: '0 0 12px' }}>
-            Piano Brands We Buy and Sell
+            {t('sellMyPiano.brandsTitle')}
           </h2>
-          <p className="text-sm text-gray-600 max-w-xl mx-auto">
-            We deal with a wide range of piano brands, offering competitive prices for both well-known and specialist brands.
-          </p>
+          <p className="text-sm text-gray-600 max-w-xl mx-auto">{t('sellMyPiano.brandsDesc')}</p>
         </div>
         {brands.length > 0
           ? <BrandsCarousel brands={brands} />
-          : <p className="text-center text-sm text-gray-400 italic">Loading brands…</p>
+          : <p className="text-center text-sm text-gray-400 italic">{t('sellMyPiano.loadingBrands')}</p>
         }
       </section>
 

@@ -16,8 +16,6 @@ import AuctionCalendarPage from '../pages/AuctionCalendarPage'
 import BeginnersAuctionGuidePage from '../pages/BeginnersAuctionGuidePage'
 import PastAuctionsPage from '../pages/PastAuctionsPage'
 import PastAuctionDetailPage from '../pages/PastAuctionDetailPage'
-import { grandPianos } from '../data/grandPianos'
-import { uprightPianos } from '../data/uprightPianos'
 import Auctions from '../pages/Auctions'
 import AuctionDetail from '../pages/AuctionDetail'
 import LotDetail from '../pages/LotDetail'
@@ -72,7 +70,6 @@ export default function AppRoutes() {
         element={
           <MainLayout>
             <PianoDetailPage
-              pianos={grandPianos}
               type="Grand Piano"
               backLink="/shop/grand-pianos"
             />
@@ -87,7 +84,6 @@ export default function AppRoutes() {
         element={
           <MainLayout>
             <PianoDetailPage
-              pianos={uprightPianos}
               type="Upright Piano"
               backLink="/shop/upright-pianos"
             />

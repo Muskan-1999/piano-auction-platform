@@ -37,6 +37,21 @@ class LotsTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('piano_type')
+                    ->label('Piano Type')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'grand'   => 'Grand Piano',
+                        'upright' => 'Upright Piano',
+                        default   => '—',
+                    })
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'grand'   => 'info',
+                        'upright' => 'success',
+                        default   => 'gray',
+                    })
+                    ->sortable(),
+
                 TextColumn::make('current_bid')
                     ->label('Current Bid')
                     ->formatStateUsing(fn ($state) => $state ? '£' . number_format($state, 0) : '—')
@@ -79,6 +94,13 @@ class LotsTable
                         'sold'      => 'Sold',
                         'unsold'    => 'Unsold',
                         'withdrawn' => 'Withdrawn',
+                    ]),
+
+                SelectFilter::make('piano_type')
+                    ->label('Piano Type')
+                    ->options([
+                        'grand'   => 'Grand Piano',
+                        'upright' => 'Upright Piano',
                     ]),
 
                 SelectFilter::make('auction_id')

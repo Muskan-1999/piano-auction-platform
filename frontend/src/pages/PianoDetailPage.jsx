@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
+import api from '../api/axios'
 import PianoImageGallery from '../components/grand-pianos/PianoImageGallery'
 import PianoAccordion from '../components/grand-pianos/PianoAccordion'
 import ImportantInformationBanner from '../components/grand-pianos/ImportantInformationBanner'
@@ -8,26 +9,75 @@ import BookingBiddingSection from '../components/grand-pianos/BookingBiddingSect
 import DeliveryQuoteForm from '../components/grand-pianos/DeliveryQuoteForm'
 import PianoFAQ from '../components/grand-pianos/PianoFAQ'
 
+function formatEst(lot) {
+  const match = lot.title?.match(/Est\.\s*(£[\d,]+[-–]£[\d,]+(?:\s+Plus\s+VAT)?)/i)
+  if (match) return match[1].trim()
+  const fmt = (n) => Number(n).toLocaleString('en-GB')
+  if (!lot.starting_bid) return ''
+  if (!lot.reserve_price || Number(lot.starting_bid) === Number(lot.reserve_price)) {
+    return `£${fmt(lot.starting_bid)}`
+  }
+  return `£${fmt(lot.starting_bid)}–£${fmt(lot.reserve_price)}`
+}
+
+function Skeleton() {
+  return (
+    <div className="w-full bg-white">
+      <div className="py-10 px-6 lg:px-10">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-14 animate-pulse">
+          <div className="aspect-[4/3] bg-gray-200 rounded" />
+          <div className="flex flex-col gap-4">
+            <div className="h-6 bg-gray-200 rounded w-3/4" />
+            <div className="h-4 bg-gray-200 rounded w-1/3" />
+            <div className="h-24 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /**
- * Shared detail page for Grand Pianos and Upright Pianos.
+ * Detail page for Grand Pianos and Upright Pianos.
+ * Fetches lot data from the API by slug so images and details
+ * always reflect the live database state.
  *
  * Props:
- *   pianos       — the relevant static data array (grandPianos or uprightPianos)
- *   type         — "Grand Piano" | "Upright Piano"
- *   backLink     — "/shop/grand-pianos" | "/shop/upright-pianos"
+ *   type     — "Grand Piano" | "Upright Piano"
+ *   backLink — "/shop/grand-pianos" | "/shop/upright-pianos"
  */
-export default function PianoDetailPage({ pianos, type, backLink }) {
+export default function PianoDetailPage({ type, backLink }) {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const piano = pianos.find((p) => p.slug === slug)
+
+  const [lot, setLot] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [notFound, setNotFound] = useState(false)
 
   useEffect(() => {
-    if (piano) {
-      document.title = `${piano.name} | Piano Auctions Ltd`
-    }
-  }, [piano])
+    setLoading(true)
+    setNotFound(false)
 
-  if (!piano) {
+    api
+      .get(`public/lots/${slug}`)
+      .then((res) => {
+        const data = res.data?.data ?? res.data
+        setLot(data)
+        document.title = `${data.title} | Piano Auctions Ltd`
+      })
+      .catch((err) => {
+        if (err.response?.status === 404) {
+          setNotFound(true)
+        } else {
+          setNotFound(true)
+        }
+      })
+      .finally(() => setLoading(false))
+  }, [slug])
+
+  if (loading) return <Skeleton />
+
+  if (notFound || !lot) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 px-6">
         <p className="text-gray-500 text-sm">Piano not found.</p>
@@ -40,6 +90,15 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
       </div>
     )
   }
+
+  const est = formatEst(lot)
+
+  // Build gallery: use featured_image as primary, gallery array for thumbnails.
+  // If gallery has items, include featured_image as first thumb if not already in gallery.
+  const rawGallery = Array.isArray(lot.gallery) ? lot.gallery : []
+  const allImages = lot.featured_image
+    ? [lot.featured_image, ...rawGallery.filter((img) => img !== lot.featured_image)]
+    : rawGallery
 
   const scrollToBidding = (e) => {
     e.preventDefault()
@@ -58,7 +117,7 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
             {type}s
           </Link>
           <span className="mx-1">&rsaquo;</span>
-          <span className="text-gray-700 line-clamp-1">{piano.name}</span>
+          <span className="text-gray-700 line-clamp-1">{lot.title}</span>
         </nav>
       </div>
 
@@ -69,14 +128,13 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
 
             {/* Left — Image gallery */}
             <PianoImageGallery
-              image={piano.image}
-              images={piano.images}
-              name={piano.name}
+              image={allImages[0] ?? null}
+              images={allImages}
+              name={lot.title}
             />
 
             {/* Right — Info */}
             <div className="flex flex-col gap-5">
-              {/* Title */}
               <h1
                 className="text-gray-900 leading-snug"
                 style={{
@@ -85,7 +143,7 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
                   fontWeight: 400,
                 }}
               >
-                – {piano.name} – | Est. {piano.est}
+                {lot.title}{est ? ` | Est. ${est}` : ''}
               </h1>
 
               {/* Category badge */}
@@ -98,8 +156,13 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
                 </Link>
               </div>
 
-              {/* Short description */}
-              <p className="text-sm text-gray-700 leading-relaxed">{piano.description}</p>
+              {/* Description */}
+              {lot.description && (
+                <p
+                  className="text-sm text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: lot.description }}
+                />
+              )}
 
               {/* Accordions */}
               <PianoAccordion />
@@ -131,7 +194,7 @@ export default function PianoDetailPage({ pianos, type, backLink }) {
         </div>
       </section>
 
-      {/* ── Shared sections (identical for both types) ── */}
+      {/* ── Shared sections ── */}
       <ImportantInformationBanner />
       <InsureBanner />
       <BookingBiddingSection />

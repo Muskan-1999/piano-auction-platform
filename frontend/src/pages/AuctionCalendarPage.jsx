@@ -3,8 +3,10 @@ import api from '../api/axios'
 import AuctionHero from '../components/auction-calendar/AuctionHero'
 import AuctionCarousel from '../components/auction-calendar/AuctionCarousel'
 import FurtherInformation from '../components/about/FurtherInformation'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function AuctionCalendarPage() {
+  const { t } = useLanguage()
   const [auctions, setAuctions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -53,9 +55,7 @@ export default function AuctionCalendarPage() {
         <div className="max-w-7xl mx-auto">
           {error ? (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-sm">
-                Unable to load auctions. Please try again later.
-              </p>
+              <p className="text-gray-500 text-sm">{t('auctionCalendar.errorMsg')}</p>
             </div>
           ) : (
             <AuctionCarousel auctions={auctions} loading={loading} />

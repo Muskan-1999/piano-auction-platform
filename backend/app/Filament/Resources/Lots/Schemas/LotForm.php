@@ -68,6 +68,14 @@ class LotForm
                     ])
                     ->nullable(),
 
+                Select::make('piano_type')
+                    ->label('Piano Type')
+                    ->options([
+                        'grand'   => 'Grand Piano',
+                        'upright' => 'Upright Piano',
+                    ])
+                    ->nullable(),
+
                 TextInput::make('starting_bid')
                     ->required()
                     ->numeric()

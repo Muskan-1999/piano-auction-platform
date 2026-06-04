@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast'
 import AppRoutes from './routes'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import queryClient from './lib/queryClient'
 import './App.css'
 
@@ -11,6 +12,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="w-full min-h-screen bg-black text-white">
+        <LanguageProvider>
         <AuthProvider>
           <NotificationProvider>
             <AppRoutes />
@@ -29,6 +31,7 @@ export default function App() {
             />
           </NotificationProvider>
         </AuthProvider>
+        </LanguageProvider>
       </div>
     </QueryClientProvider>
   )

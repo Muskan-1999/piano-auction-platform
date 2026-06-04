@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const HERO_IMG = 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80'
 
@@ -41,6 +42,7 @@ function BrandCard({ brand }) {
 }
 
 export default function PianoBrandsPage() {
+  const { t } = useLanguage()
   const [brands, setBrands] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -64,19 +66,14 @@ export default function PianoBrandsPage() {
       >
         <div className="absolute inset-0 bg-black/65" />
         <div className="relative z-10 text-center px-6 py-20">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-white/60 mb-5">
-            PIANO AUCTIONS LTD
-          </p>
-          <h1
-            className="text-white mb-6"
-            style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3rem)' }}
-          >
-            Piano Brands
+          <p className="text-[11px] uppercase tracking-[0.3em] text-white/60 mb-5">{t('pianoBrands.pageLabel')}</p>
+          <h1 className="text-white mb-6" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: 'clamp(2.2rem, 5vw, 3rem)' }}>
+            {t('pianoBrands.heroTitle')}
           </h1>
           <nav className="text-sm text-white/70">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <Link to="/" className="hover:text-white transition-colors">{t('pianoBrands.breadcrumbHome')}</Link>
             <span className="mx-2">»</span>
-            <span className="text-white/90">Piano Brands</span>
+            <span className="text-white/90">{t('pianoBrands.breadcrumbPage')}</span>
           </nav>
         </div>
       </section>
@@ -84,16 +81,10 @@ export default function PianoBrandsPage() {
       {/* ── OUR PIANO BRANDS ── */}
       <section className="py-16 px-6 bg-white text-center">
         <div className="max-w-lg mx-auto">
-          <h2
-            className="text-gray-900 mb-5"
-            style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: 'clamp(1.7rem, 3vw, 2.2rem)' }}
-          >
-            Our Piano Brands
+          <h2 className="text-gray-900 mb-5" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, fontSize: 'clamp(1.7rem, 3vw, 2.2rem)' }}>
+            {t('pianoBrands.brandsLabel')}
           </h2>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            Piano Auctions Ltd is a world leading specialist piano auction and is the home of buying
-            and selling upright and grand pianos at auction.
-          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">{t('pianoBrands.brandsBody')}</p>
           {/* Decorative divider */}
           <div className="flex justify-center mt-8">
             <div className="w-px bg-gray-400" style={{ height: '48px' }} />

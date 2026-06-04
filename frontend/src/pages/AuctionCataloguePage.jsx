@@ -5,8 +5,10 @@ import CatalogueCtaStrip from '../components/auction-catalogue/CatalogueCtaStrip
 import CatalogueLotGrid from '../components/auction-catalogue/CatalogueLotGrid'
 import CatalogueAvailableSoon from '../components/auction-catalogue/CatalogueAvailableSoon'
 import BrandsStrip from '../components/auction-catalogue/BrandsStrip'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function AuctionCataloguePage() {
+  const { t } = useLanguage()
   const [auction, setAuction] = useState(undefined) // undefined = not yet fetched
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(false)
@@ -42,9 +44,7 @@ export default function AuctionCataloguePage() {
       {/* Error state */}
       {error && (
         <section className="py-24 px-6 text-center">
-          <p className="text-gray-500 text-sm">
-            Unable to load catalogue. Please try again later.
-          </p>
+          <p className="text-gray-500 text-sm">{t('catalogue.errorMsg')}</p>
         </section>
       )}
 

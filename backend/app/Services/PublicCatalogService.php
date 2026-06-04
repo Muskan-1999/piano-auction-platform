@@ -255,6 +255,10 @@ class PublicCatalogService
             $query->where('brand', 'like', '%' . $request->string('brand') . '%');
         }
 
+        if ($request->filled('piano_type')) {
+            $query->where('piano_type', $request->string('piano_type'));
+        }
+
         if ($request->filled('auction_type')) {
             $query->whereHas('auction', function ($query) use ($request) {
                 $query->where('auction_type', $request->string('auction_type'));

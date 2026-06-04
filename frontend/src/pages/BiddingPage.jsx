@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiAlertCircle, FiBookOpen, FiCalendar, FiMail } from 'react-icons/fi'
 import biddingApi from '../api/bidding'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -12,32 +13,13 @@ const initPersonal = () => ({
 const initLots = () =>
   Array(5).fill(null).map(() => ({ lot_number: '', description: '' }))
 
-const FURTHER_CARDS = [
-  {
-    key: 'catalogue',
-    title: 'View Catalogue',
-    desc: "Take a look at our latest piano on offer in our auction catalogue.",
-    btn: 'View Catalogue',
-    img: 'https://images.unsplash.com/photo-1552422535-c45813c61732?w=700&q=80',
-    href: '/auction-portal/catalogue',
-  },
-  {
-    key: 'appointment',
-    title: 'Book Appointment',
-    desc: 'Book your appointment to come and see our pianos.',
-    btn: 'Book an Appointment',
-    img: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=700&q=80',
-    href: '/contact',
-  },
-  {
-    key: 'contact',
-    title: 'Contact us',
-    desc: "If you need to speak to us, please don't hesitate to get in touch.",
-    btn: 'Contact Us',
-    img: 'https://images.unsplash.com/photo-1543443258-92b04ad5ec6b?w=700&q=80',
-    href: '/contact',
-  },
+const FURTHER_CARD_IMGS = [
+  'https://images.unsplash.com/photo-1552422535-c45813c61732?w=700&q=80',
+  'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=700&q=80',
+  'https://images.unsplash.com/photo-1543443258-92b04ad5ec6b?w=700&q=80',
 ]
+const FURTHER_CARD_HREFS = ['/auction-portal/catalogue', '/contact', '/contact']
+const FURTHER_CARD_KEYS  = ['catalogue', 'appointment', 'contact']
 
 const STRIP_IMAGES = [
   'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=400&q=70',
@@ -63,18 +45,16 @@ const validatePersonal = (data) => {
   return errs
 }
 
-function StepProgress({ step, step2Label }) {
+function StepProgress({ step, step1Label, step2Label }) {
   return (
     <div className="mb-8">
       <div className="relative h-px bg-gray-200">
-        <div
-          className="absolute left-0 top-0 h-full bg-green-600 transition-all duration-300"
-          style={{ width: step === 1 ? '50%' : '100%' }}
-        />
+        <div className="absolute left-0 top-0 h-full bg-green-600 transition-all duration-300"
+          style={{ width: step === 1 ? '50%' : '100%' }} />
       </div>
       <div className="flex items-start justify-between mt-1">
         <span className={`text-xs font-medium ${step >= 1 ? 'text-green-600' : 'text-gray-400'}`}>
-          Personal details
+          {step1Label}
         </span>
         <span className={`text-xs font-medium text-right ${step === 2 ? 'text-green-600' : 'text-gray-400'}`}>
           {step2Label}
@@ -227,8 +207,13 @@ function LotTable({ lots, onChange, errors, showMaxBid, maxBids, onMaxBidChange 
 
 export default function BiddingPage() {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const telSuccessRef = useRef(null)
   const absSuccessRef = useRef(null)
+
+  const FURTHER_CARDS = t('bidding.furtherCards').map((c, i) => ({
+    ...c, key: FURTHER_CARD_KEYS[i], img: FURTHER_CARD_IMGS[i], href: FURTHER_CARD_HREFS[i],
+  }))
 
   // ── Telephone form state ─────────────────────────────────────────────────
   const [tel, setTel]                   = useState(initPersonal())
@@ -313,7 +298,7 @@ export default function BiddingPage() {
         lot_5_description: telLots[4].description || null,
         one_piano_only:    telOnePiano === 'yes',
       })
-      setTelSuccess('Your bid has been submitted successfully. We will be in touch shortly.')
+      setTelSuccess(t('bidding.successMsg'))
       setTelErrors({})
       setTelStep(1)
       setTel(initPersonal())
@@ -363,7 +348,7 @@ export default function BiddingPage() {
         currency:          'GBP',
         one_piano_only:    absOnePiano === 'yes',
       })
-      setAbsSuccess('Your bid has been submitted successfully. We will be in touch shortly.')
+      setAbsSuccess(t('bidding.successMsg'))
       setAbsErrors({})
       setAbsStep(1)
       setAbs(initPersonal())
@@ -398,17 +383,17 @@ export default function BiddingPage() {
       >
         <div className="absolute inset-0 bg-black/65" />
         <div className="relative z-10 text-center px-4">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-3">BIDDING</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-3">{t('bidding.pageLabel')}</p>
           <h1
             className="font-heading text-white text-center"
             style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 400, margin: 0 }}
           >
-            Ways To Bid At Auction
+            {t('bidding.heroTitle')}
           </h1>
           <nav className="mt-3 text-xs text-white/60 text-center">
-            <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <Link to="/" className="hover:text-white transition-colors">{t('bidding.breadcrumbHome')}</Link>
             <span className="mx-2">&rsaquo;</span>
-            <span className="text-white/80">Bidding</span>
+            <span className="text-white/80">{t('bidding.breadcrumbPage')}</span>
           </nav>
         </div>
       </section>
@@ -419,11 +404,9 @@ export default function BiddingPage() {
           className="font-heading text-gray-900 max-w-xl mx-auto mb-3 text-center"
           style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem, 2.5vw, 1.9rem)', marginBottom: '12px' }}
         >
-          Our simple ways to bid on a piano at auction
+          {t('bidding.introTitle')}
         </h2>
-        <p className="text-sm text-gray-500 max-w-2xl mx-auto text-center">
-          Piano Auctions Ltd is a world leading specialist piano auction and is the home of buying and selling upright and grand pianos at auction.
-        </p>
+        <p className="text-sm text-gray-500 max-w-2xl mx-auto text-center">{t('bidding.introDesc')}</p>
       </section>
 
       {/* ── THREE BIDDING CARDS ── */}
@@ -444,11 +427,11 @@ export default function BiddingPage() {
                 className="font-heading text-gray-900 text-center"
                 style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 400, margin: 0 }}
               >
-                Online Bidding
+                {t('bidding.onlineBiddingTitle')}
               </h2>
             </div>
             <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto text-center">
-              Bid for your favourite piano or watch the latest auction live with{' '}
+              {t('bidding.onlineBiddingDesc').replace('easyliveauction.com', '')}{' '}
               <a href="https://www.easyliveauction.com" target="_blank" rel="noopener noreferrer" className="underline text-gray-700 hover:text-black">
                 easyliveauction.com
               </a>
@@ -458,13 +441,13 @@ export default function BiddingPage() {
                 onClick={() => navigate('/auction-portal')}
                 className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-black hover:text-white transition-colors"
               >
-                UK – Bid Now
+                {t('bidding.ukBidNow')}
               </button>
               <button
                 onClick={() => navigate('/auction-portal')}
                 className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-black hover:text-white transition-colors"
               >
-                EU – Bid Now
+                {t('bidding.euBidNow')}
               </button>
             </div>
           </div>
@@ -478,15 +461,13 @@ export default function BiddingPage() {
                   className="font-heading text-gray-900 text-center"
                   style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 400, margin: 0 }}
                 >
-                  Telephone Bidding
+                  {t('bidding.telephoneTitle')}
                 </h2>
               </div>
-              <p className="text-sm text-gray-500 text-center">
-                Please fill out the information below and a Telephone Bid Form will be sent to you to complete.
-              </p>
+              <p className="text-sm text-gray-500 text-center">{t('bidding.telephoneDesc')}</p>
             </div>
 
-            <StepProgress step={telStep} step2Label="Telephone Bid" />
+            <StepProgress step={telStep} step1Label={t('bidding.personalDetails')} step2Label={t('bidding.telephoneBid')} />
 
             {telSuccess && (
               <div ref={telSuccessRef} className="mb-6 border border-green-200 bg-green-50 p-4 text-sm text-green-800 text-center">
@@ -523,55 +504,35 @@ export default function BiddingPage() {
                 {/* One piano only */}
                 <div className="text-center">
                   <p className="text-xs font-medium text-gray-700 mb-2">
-                    One piano only <span className="text-red-500">*</span>
+                    {t('bidding.onePianoOnly')} <span className="text-red-500">*</span>
                   </p>
                   <div className="flex items-center justify-center gap-6">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="telOnePiano"
-                        value="yes"
-                        checked={telOnePiano === 'yes'}
-                        onChange={() => setTelOnePiano('yes')}
-                        className="h-4 w-4 accent-gray-900"
-                      />
-                      <span className="text-sm text-gray-800">Yes</span>
+                      <input type="radio" name="telOnePiano" value="yes" checked={telOnePiano === 'yes'} onChange={() => setTelOnePiano('yes')} className="h-4 w-4 accent-gray-900" />
+                      <span className="text-sm text-gray-800">{t('bidding.yes')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="telOnePiano"
-                        value="no"
-                        checked={telOnePiano === 'no'}
-                        onChange={() => setTelOnePiano('no')}
-                        className="h-4 w-4 accent-gray-900"
-                      />
-                      <span className="text-sm text-gray-800">No</span>
+                      <input type="radio" name="telOnePiano" value="no" checked={telOnePiano === 'no'} onChange={() => setTelOnePiano('no')} className="h-4 w-4 accent-gray-900" />
+                      <span className="text-sm text-gray-800">{t('bidding.no')}</span>
                     </label>
                   </div>
                 </div>
 
                 {telErrors.submit && (
                   <p className="text-sm text-red-600 flex items-center justify-center gap-1">
-                    <FiAlertCircle className="h-4 w-4 flex-shrink-0" />
-                    {telErrors.submit}
+                    <FiAlertCircle className="h-4 w-4 flex-shrink-0" />{telErrors.submit}
                   </p>
                 )}
 
                 <div className="flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => { setTelStep(1); setTelErrors({}) }}
-                    className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-50 transition-colors"
-                  >
-                    Previous
+                  <button type="button" onClick={() => { setTelStep(1); setTelErrors({}) }}
+                    className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-50 transition-colors">
+                    {t('bidding.previous')}
                   </button>
-                  <button
-                    type="submit"
-                    disabled={telSubmitting}
+                  <button type="submit" disabled={telSubmitting}
                     className="bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-900 transition-colors disabled:opacity-60"
                   >
-                    {telSubmitting ? 'Sending…' : 'Send'}
+                    {telSubmitting ? t('bidding.sending') : t('bidding.send')}
                   </button>
                 </div>
               </form>
@@ -587,15 +548,13 @@ export default function BiddingPage() {
                   className="font-heading text-gray-900 text-center"
                   style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 400, margin: 0 }}
                 >
-                  Absentee Bidding
+                  {t('bidding.absenteeTitle')}
                 </h2>
               </div>
-              <p className="text-sm text-gray-500 text-center">
-                Please fill out the information below and an Absentee Bid Form will be sent to you to complete.
-              </p>
+              <p className="text-sm text-gray-500 text-center">{t('bidding.absenteeDesc')}</p>
             </div>
 
-            <StepProgress step={absStep} step2Label="Absentee Bid" />
+            <StepProgress step={absStep} step1Label={t('bidding.personalDetails')} step2Label={t('bidding.absenteeBid')} />
 
             {absSuccess && (
               <div ref={absSuccessRef} className="mb-6 border border-green-200 bg-green-50 p-4 text-sm text-green-800 text-center">
@@ -632,55 +591,34 @@ export default function BiddingPage() {
                 {/* One piano only */}
                 <div className="text-center">
                   <p className="text-xs font-medium text-gray-700 mb-2">
-                    One piano only <span className="text-red-500">*</span>
+                    {t('bidding.onePianoOnly')} <span className="text-red-500">*</span>
                   </p>
                   <div className="flex items-center justify-center gap-6">
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="absOnePiano"
-                        value="yes"
-                        checked={absOnePiano === 'yes'}
-                        onChange={() => setAbsOnePiano('yes')}
-                        className="h-4 w-4 accent-gray-900"
-                      />
-                      <span className="text-sm text-gray-800">Yes</span>
+                      <input type="radio" name="absOnePiano" value="yes" checked={absOnePiano === 'yes'} onChange={() => setAbsOnePiano('yes')} className="h-4 w-4 accent-gray-900" />
+                      <span className="text-sm text-gray-800">{t('bidding.yes')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="absOnePiano"
-                        value="no"
-                        checked={absOnePiano === 'no'}
-                        onChange={() => setAbsOnePiano('no')}
-                        className="h-4 w-4 accent-gray-900"
-                      />
-                      <span className="text-sm text-gray-800">No</span>
+                      <input type="radio" name="absOnePiano" value="no" checked={absOnePiano === 'no'} onChange={() => setAbsOnePiano('no')} className="h-4 w-4 accent-gray-900" />
+                      <span className="text-sm text-gray-800">{t('bidding.no')}</span>
                     </label>
                   </div>
                 </div>
 
                 {absErrors.submit && (
                   <p className="text-sm text-red-600 flex items-center justify-center gap-1">
-                    <FiAlertCircle className="h-4 w-4 flex-shrink-0" />
-                    {absErrors.submit}
+                    <FiAlertCircle className="h-4 w-4 flex-shrink-0" />{absErrors.submit}
                   </p>
                 )}
 
                 <div className="flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => { setAbsStep(1); setAbsErrors({}) }}
-                    className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-50 transition-colors"
-                  >
-                    Previous
+                  <button type="button" onClick={() => { setAbsStep(1); setAbsErrors({}) }}
+                    className="border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-50 transition-colors">
+                    {t('bidding.previous')}
                   </button>
-                  <button
-                    type="submit"
-                    disabled={absSubmitting}
-                    className="bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-900 transition-colors disabled:opacity-60"
-                  >
-                    {absSubmitting ? 'Sending…' : 'Send'}
+                  <button type="submit" disabled={absSubmitting}
+                    className="bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 px-8 hover:bg-gray-900 transition-colors disabled:opacity-60">
+                    {absSubmitting ? t('bidding.sending') : t('bidding.send')}
                   </button>
                 </div>
               </form>
@@ -694,12 +632,10 @@ export default function BiddingPage() {
       <section className="py-20 px-6 lg:px-10 bg-gray-950">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-[11px] uppercase tracking-[0.3em] text-gray-400 mb-3 text-center">USE OUR SERVICES TODAY</p>
-            <h2
-              className="font-heading text-white text-center"
-              style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', margin: 0 }}
-            >
-              Further Information
+            <p className="text-[11px] uppercase tracking-[0.3em] text-gray-400 mb-3 text-center">{t('bidding.furtherLabel')}</p>
+            <h2 className="font-heading text-white text-center"
+              style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.8rem, 3vw, 2.6rem)', margin: 0 }}>
+              {t('bidding.furtherTitle')}
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -725,9 +661,9 @@ export default function BiddingPage() {
                     onClick={(e) => { e.stopPropagation(); navigate(card.href) }}
                     className="border border-white text-white text-[11px] font-semibold tracking-wider uppercase py-2 px-5 hover:bg-white hover:text-black transition-colors inline-flex items-center gap-2"
                   >
-                    {card.btn === 'View Catalogue'      && <FiBookOpen className="h-4 w-4" />}
-                    {card.btn === 'Book an Appointment' && <FiCalendar className="h-4 w-4" />}
-                    {card.btn === 'Contact Us'          && <FiMail    className="h-4 w-4" />}
+                    {card.key === 'catalogue'   && <FiBookOpen className="h-4 w-4" />}
+                    {card.key === 'appointment' && <FiCalendar className="h-4 w-4" />}
+                    {card.key === 'contact'     && <FiMail    className="h-4 w-4" />}
                     {card.btn}
                   </button>
                 </div>

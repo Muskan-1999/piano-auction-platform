@@ -35,11 +35,16 @@ function formatEstimate(lot) {
 }
 
 function getLotPath(lot) {
+  if (lot.piano_type === 'grand') return `/shop/grand-pianos/${lot.slug}`
+  if (lot.piano_type === 'upright') return `/shop/upright-pianos/${lot.slug}`
+  // fallback: derive from title for legacy lots without piano_type
   const title = lot.title || ''
   if (title.includes('Grand')) return `/shop/grand-pianos/${lot.slug}`
   if (title.includes('Upright')) return `/shop/upright-pianos/${lot.slug}`
   return `/shop/other/${lot.slug}`
 }
+
+const PIANO_TYPE_LABEL = { grand: 'Grand Piano', upright: 'Upright Piano' }
 
 export default function CatalogueLotCard({ lot }) {
   const navigate = useNavigate()
@@ -71,6 +76,15 @@ export default function CatalogueLotCard({ lot }) {
 
       {/* Info */}
       <div className="p-2 border-t border-gray-100">
+        {lot.piano_type && (
+          <span className={`inline-block text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-sm mb-1 ${
+            lot.piano_type === 'grand'
+              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+              : 'bg-stone-50 text-stone-600 border border-stone-200'
+          }`}>
+            {PIANO_TYPE_LABEL[lot.piano_type]}
+          </span>
+        )}
         <p className="text-[11px] text-gray-800 leading-snug font-medium line-clamp-2">
           {lot.title}
         </p>

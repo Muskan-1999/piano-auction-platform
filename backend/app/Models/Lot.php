@@ -25,6 +25,9 @@ class Lot extends Model
     public const CONDITION_POOR      = 'poor';
     public const CONDITION_UNKNOWN   = 'unknown';
 
+    public const PIANO_TYPE_GRAND   = 'grand';
+    public const PIANO_TYPE_UPRIGHT = 'upright';
+
     protected $fillable = [
         'auction_id',
         'title',
@@ -36,6 +39,7 @@ class Lot extends Model
         'serial_number',
         'year',
         'condition',
+        'piano_type',
         'starting_bid',
         'reserve_price',
         'current_bid',

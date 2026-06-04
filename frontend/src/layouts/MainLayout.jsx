@@ -1,6 +1,7 @@
 import React from 'react'
 import NavBar from '../components/NavBar'
 import Footer from '../components/Footer'
+import FloatingLanguageSwitcher from '../components/FloatingLanguageSwitcher'
 
 export default function MainLayout({ children }) {
   return (
@@ -8,6 +9,7 @@ export default function MainLayout({ children }) {
       <NavBar />
       <main className="flex-1 w-full">{children}</main>
       <Footer />
+      <FloatingLanguageSwitcher />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import ValuationModal from '../components/value-piano/ValuationModal'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const IMG = {
   hero:      'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?w=1600&q=80',
@@ -16,6 +17,7 @@ const inputCls =
   'w-full border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-gray-700 transition-colors'
 
 function HeroCard({ onSubmit }) {
+  const { t } = useLanguage()
   const [form, setForm]     = useState({ first_name: '', last_name: '', email: '', phone: '' })
   const [errors, setErrors] = useState({})
 
@@ -41,46 +43,38 @@ function HeroCard({ onSubmit }) {
 
   return (
     <form onSubmit={submit} className="w-full max-w-sm bg-white shadow-2xl p-7 flex-shrink-0">
-      <h2
-        className="text-base text-gray-900 mb-1"
-        style={{ fontFamily: 'Georgia, serif', fontWeight: 400, color: '#b89c6a' }}
-      >
-        Use Our Piano Valuation Form
+      <h2 className="text-base text-gray-900 mb-1" style={{ fontFamily: 'Georgia, serif', fontWeight: 400, color: '#b89c6a' }}>
+        {t('valuePiano.formTitle')}
       </h2>
       <div className="w-8 h-px bg-amber-600 mb-5" />
 
       <div className="grid grid-cols-2 gap-3 mb-3">
         <div>
-          <label className="block text-xs text-gray-500 mb-1">First Name <span className="text-red-400">*</span></label>
-          <input type="text" name="first_name" value={form.first_name} onChange={handle}
-            placeholder="Name" className={inputCls} />
+          <label className="block text-xs text-gray-500 mb-1">{t('valuePiano.firstName')} <span className="text-red-400">*</span></label>
+          <input type="text" name="first_name" value={form.first_name} onChange={handle} placeholder={t('valuePiano.firstName')} className={inputCls} />
           {errors.first_name && <p className="text-xs text-red-500 mt-0.5">{errors.first_name}</p>}
         </div>
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Last Name <span className="text-red-400">*</span></label>
-          <input type="text" name="last_name" value={form.last_name} onChange={handle}
-            placeholder="Last Name" className={inputCls} />
+          <label className="block text-xs text-gray-500 mb-1">{t('valuePiano.lastName')} <span className="text-red-400">*</span></label>
+          <input type="text" name="last_name" value={form.last_name} onChange={handle} placeholder={t('valuePiano.lastName')} className={inputCls} />
           {errors.last_name && <p className="text-xs text-red-500 mt-0.5">{errors.last_name}</p>}
         </div>
       </div>
 
       <div className="mb-3">
-        <label className="block text-xs text-gray-500 mb-1">Email <span className="text-red-400">*</span></label>
-        <input type="email" name="email" value={form.email} onChange={handle}
-          placeholder="Email" className={inputCls} />
+        <label className="block text-xs text-gray-500 mb-1">{t('valuePiano.email')} <span className="text-red-400">*</span></label>
+        <input type="email" name="email" value={form.email} onChange={handle} placeholder={t('valuePiano.email')} className={inputCls} />
         {errors.email && <p className="text-xs text-red-500 mt-0.5">{errors.email}</p>}
       </div>
 
       <div className="mb-5">
-        <label className="block text-xs text-gray-500 mb-1">Phone <span className="text-red-400">*</span></label>
-        <input type="tel" name="phone" value={form.phone} onChange={handle}
-          placeholder="Phone" className={inputCls} />
+        <label className="block text-xs text-gray-500 mb-1">{t('valuePiano.phone')} <span className="text-red-400">*</span></label>
+        <input type="tel" name="phone" value={form.phone} onChange={handle} placeholder={t('valuePiano.phone')} className={inputCls} />
         {errors.phone && <p className="text-xs text-red-500 mt-0.5">{errors.phone}</p>}
       </div>
 
-      <button type="submit"
-        className="w-full bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 hover:bg-gray-800 transition-colors">
-        Next
+      <button type="submit" className="w-full bg-black text-white text-xs font-semibold tracking-wider uppercase py-3 hover:bg-gray-800 transition-colors">
+        {t('valuePiano.nextBtn')}
       </button>
     </form>
   )
@@ -148,6 +142,7 @@ function BrandsCarousel({ brands }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ValueMyPianoPage() {
+  const { t } = useLanguage()
   const [modalOpen, setModalOpen]       = useState(false)
   const [personalData, setPersonalData] = useState({})
   const [brands, setBrands]             = useState([])
@@ -176,23 +171,18 @@ export default function ValueMyPianoPage() {
           {/* Left text */}
           <div className="flex-1 max-w-lg">
             <nav className="mb-4 text-xs text-white/60">
-              <Link to="/" className="hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="hover:text-white transition-colors">{t('valuePiano.breadcrumbHome')}</Link>
               <span className="mx-2">&rsaquo;</span>
-              <span className="text-white/80">Value My Piano</span>
+              <span className="text-white/80">{t('valuePiano.breadcrumbPage')}</span>
             </nav>
-            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">
-              Formal Written Piano Valuation
-            </p>
-            <h1
-              className="text-white leading-tight mb-5"
-              style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', fontWeight: 400 }}
-            >
-              Value My Piano
+            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60 mb-3">{t('valuePiano.pageLabel')}</p>
+            <h1 className="text-white leading-tight mb-5" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', fontWeight: 400 }}>
+              {t('valuePiano.heroTitle')}
             </h1>
             <p className="text-white/80 text-sm leading-relaxed max-w-md">
-              We offer a professional, hassle-free service to help you value and{' '}
-              <Link to="/sell-my-piano" className="underline text-white/90 hover:text-white">sell your piano</Link>,
-              ensuring you receive the best price through expert piano valuation.
+              {t('valuePiano.heroDesc')}{' '}
+              <Link to="/sell-my-piano" className="underline text-white/90 hover:text-white">{t('valuePiano.heroDescLink')}</Link>
+              {t('valuePiano.heroDescEnd')}
             </p>
           </div>
 
@@ -210,37 +200,24 @@ export default function ValueMyPianoPage() {
             <div className="flex items-start gap-4 mb-6">
               <div className="w-1 bg-black flex-shrink-0 self-stretch" style={{ minHeight: '80px' }} />
               <div>
-                <h2
-                  className="text-gray-900 leading-snug"
-                  style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}
-                >
-                  Formal Written Piano Valuation
+                <h2 className="text-gray-900 leading-snug" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}>
+                  {t('valuePiano.section1Title')}
                 </h2>
               </div>
             </div>
 
-            <p className="text-gray-600 text-sm leading-relaxed mb-4">
-              We also offer a formal written piano valuation service. This valuation service can be used for enquiries regarding the following:
-            </p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-4">{t('valuePiano.section1P')}</p>
 
             <ul className="text-gray-600 text-sm leading-loose mb-4 list-disc list-inside space-y-1">
-              <li>Insurance</li>
-              <li>Resale value</li>
-              <li>Purchase advice</li>
-              <li>Probate</li>
+              {t('valuePiano.valuationUses').map((item) => <li key={item}>{item}</li>)}
             </ul>
 
             <p className="text-gray-600 text-sm leading-relaxed mb-8">
-              Our{' '}
-              <Link to="/contact" className="underline text-gray-700 hover:text-gray-900">piano specialists</Link>{' '}
-              will be able to help you with any problem you may have with valuing your piano. For this service we charge a set fee, please contact us for more details.
+              {t('valuePiano.section1P2')}
             </p>
 
-            <Link
-              to="/contact"
-              className="inline-block border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors"
-            >
-              Contact Us
+            <Link to="/contact" className="inline-block border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors">
+              {t('valuePiano.contactUsBtn')}
             </Link>
           </div>
 
@@ -262,24 +239,16 @@ export default function ValueMyPianoPage() {
 
           {/* Right dark content */}
           <div className="bg-black flex flex-col justify-center px-12 py-16">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-4">Auction Archives</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-4">{t('valuePiano.pastAuctionsLabel')}</p>
             <div className="flex items-start gap-4 mb-6">
               <div className="w-1 bg-amber-500 flex-shrink-0 self-stretch" style={{ minHeight: '60px' }} />
-              <h2
-                className="text-white leading-snug"
-                style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}
-              >
-                View Our Past Piano Auctions
+              <h2 className="text-white leading-snug" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}>
+                {t('valuePiano.pastAuctionsTitle')}
               </h2>
             </div>
-            <p className="text-white/70 text-sm leading-relaxed mb-8 max-w-sm">
-              Our past piano auctions in Bedford can be used to get a rough estimate of the potential valuation of your piano based on the make and brand of your piano.
-            </p>
-            <Link
-              to="/auctions"
-              className="inline-block border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors self-start"
-            >
-              View Piano Auction Catalogue
+            <p className="text-white/70 text-sm leading-relaxed mb-8 max-w-sm">{t('valuePiano.pastAuctionsBody')}</p>
+            <Link to="/auctions" className="inline-block border border-white text-white text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-white hover:text-black transition-colors self-start">
+              {t('valuePiano.pastAuctionsBtn')}
             </Link>
           </div>
         </div>
@@ -291,24 +260,16 @@ export default function ValueMyPianoPage() {
 
           {/* Left content */}
           <div className="bg-white flex flex-col justify-center px-12 py-16">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-4">Piano Auctions Ltd</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-4">{t('valuePiano.aboutLabel')}</p>
             <div className="flex items-start gap-4 mb-6">
               <div className="w-1 bg-black flex-shrink-0 self-stretch" style={{ minHeight: '60px' }} />
-              <h2
-                className="text-gray-900 leading-snug"
-                style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}
-              >
-                About Us
+              <h2 className="text-gray-900 leading-snug" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 400 }}>
+                {t('valuePiano.aboutTitle')}
               </h2>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed mb-8 max-w-sm">
-              Piano Auctions Ltd is a world leading specialist piano auction and is the home of buying and selling upright and grand pianos at auction.
-            </p>
-            <Link
-              to="/contact"
-              className="inline-block border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors self-start"
-            >
-              Read More About Us
+            <p className="text-gray-600 text-sm leading-relaxed mb-8 max-w-sm">{t('valuePiano.aboutBody')}</p>
+            <Link to="/contact" className="inline-block border border-black text-black text-xs font-semibold tracking-wider uppercase py-3 px-6 hover:bg-black hover:text-white transition-colors self-start">
+              {t('valuePiano.aboutBtn')}
             </Link>
           </div>
 
@@ -322,12 +283,9 @@ export default function ValueMyPianoPage() {
       {/* ── SECTION 4: Piano Brands We Value ── */}
       <section className="py-20 px-0 bg-white">
         <div className="text-center mb-10 px-6 lg:px-10">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-3">Brands At Auction</p>
-          <h2
-            className="text-gray-900"
-            style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 400 }}
-          >
-            Piano Brands We Value
+          <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-3">{t('valuePiano.brandsLabel')}</p>
+          <h2 className="text-gray-900" style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', fontWeight: 400 }}>
+            {t('valuePiano.brandsTitle')}
           </h2>
         </div>
         <BrandsCarousel brands={brands} />
